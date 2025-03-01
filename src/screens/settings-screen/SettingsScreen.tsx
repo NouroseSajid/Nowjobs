@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Button, StyleSheet, Switch } from 'react-native';
 import i18next from 'i18next';
 import { useTheme, COLOR_SCHEMES } from '../../theme';
-import '../../i18n/i18n';
+import '../../i18n';
 
 const SettingsScreen: React.FC = () => {
     const { colors, isDark, setScheme } = useTheme();
