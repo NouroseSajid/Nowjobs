@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import i18next from 'i18next';
-import { useTheme } from '../../theme';
+import { useTheme } from '../../theme/theme';
 import { TAB_BAR_CONFIG, HEADER_CONFIG, TAB_SCREENS } from '../navigation-constants'; // Update import to use JS version
 import { IconProps } from '../../types/global'; // Import IconProps from global.d.ts
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import './src/i18n';
 import { NavigationContainer } from '@react-navigation/native';
-import { ThemeProvider } from './src/theme';
+import { ThemeProvider } from './src/theme/theme';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
 
 const App: React.FC = () => {

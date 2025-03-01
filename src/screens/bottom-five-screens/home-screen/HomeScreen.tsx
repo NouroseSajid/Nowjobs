@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Button, StyleSheet, FlatList } from 'react-native';
 import i18next from 'i18next';
 import TodosList from './components/TodosList';
-import { useTheme } from '../../../theme';
+import { useTheme } from '../../../theme/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ navigation }) => {

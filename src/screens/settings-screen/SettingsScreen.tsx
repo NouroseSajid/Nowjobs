@@ -1,49 +1,64 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Switch } from 'react-native';
-import i18next from 'i18next';
-import { useTheme, COLOR_SCHEMES } from '../../theme';
-import '../../i18n';
+import { useTranslation } from 'react-i18next';
+import { useTheme, COLOR_SCHEMES } from '../../theme/theme';
+import { changeLanguage, getCurrentLanguage, SupportedLanguage } from '../../i18n';
 
 const SettingsScreen: React.FC = () => {
     const { colors, isDark, setScheme } = useTheme();
+    const { t } = useTranslation();
+    const [currentLang, setCurrentLang] = useState<SupportedLanguage>(getCurrentLanguage() as SupportedLanguage);
+    
     const styles = dynamicStyles(colors);
 
-    const changeLanguage = (lng: string) => {
-        i18next.changeLanguage(lng);
+    // Handle language change
+    const handleLanguageChange = async (lng: SupportedLanguage) => {
+        await changeLanguage(lng);
+        setCurrentLang(lng);
     };
 
     return (
         <View style={styles.container}>
-            <Switch
-                value={isDark}
-                onValueChange={(value) => {
-                    setScheme(value ? COLOR_SCHEMES.DARK : COLOR_SCHEMES.LIGHT);
-                }}
-            />
-            <Text style={styles.text}>
-                {isDark ? 'Dark Mode' : 'Light Mode'}
-            </Text>
-            <Text style={styles.text}>Settings Screen</Text>
-            <View style={styles.buttonContainer}>
-                <Button
-                    title="English"
-                    onPress={() => changeLanguage('en')}
-                    color={colors.primary}
+            <View style={styles.switchContainer}>
+                <Switch
+                    value={isDark}
+                    onValueChange={(value) => {
+                        setScheme(value ? COLOR_SCHEMES.DARK : COLOR_SCHEMES.LIGHT);
+                    }}
                 />
+                <Text style={styles.switchLabel}>
+                    {isDark ? t('settingsScreen.darkMode') : t('settingsScreen.lightMode')}
+                </Text>
             </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    title="French"
-                    onPress={() => changeLanguage('fr')}
-                    color={colors.primary}
-                />
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    title="Dutch"
-                    onPress={() => changeLanguage('nl')}
-                    color={colors.primary}
-                />
+            
+            <Text style={styles.headerText}>{t('settingsScreen.settings')}</Text>
+            
+            <View style={styles.languageContainer}>
+                <Text style={styles.languageTitle}>{t('settings')}</Text>
+                
+                <View style={styles.buttonContainer}>
+                    <Button
+                        title={t('settingsScreen.english')}
+                        onPress={() => handleLanguageChange('en')}
+                        color={currentLang === 'en' ? colors.accent : colors.primary}
+                    />
+                </View>
+                
+                <View style={styles.buttonContainer}>
+                    <Button
+                        title={t('settingsScreen.french')}
+                        onPress={() => handleLanguageChange('fr')}
+                        color={currentLang === 'fr' ? colors.accent : colors.primary}
+                    />
+                </View>
+                
+                <View style={styles.buttonContainer}>
+                    <Button
+                        title={t('settingsScreen.dutch')}
+                        onPress={() => handleLanguageChange('nl')}
+                        color={currentLang === 'nl' ? colors.accent : colors.primary}
+                    />
+                </View>
             </View>
         </View>
     );
@@ -55,13 +70,41 @@ const dynamicStyles = (colors: any) => StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: colors.background,
+        padding: 20,
+    },
+    headerText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: colors.textPrimary,
+        marginBottom: 30,
+    },
+    switchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 30,
+    },
+    switchLabel: {
+        fontSize: 18,
+        color: colors.textPrimary,
+        marginLeft: 10,
     },
     text: {
+        fontSize: 18,
+        color: colors.textPrimary,
+    },
+    languageContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    languageTitle: {
         fontSize: 20,
-        color: colors.text,
+        fontWeight: 'bold',
+        color: colors.textPrimary,
+        marginBottom: 15,
     },
     buttonContainer: {
         margin: 10,
+        width: 150,
     },
 });
 
