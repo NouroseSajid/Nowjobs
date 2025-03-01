@@ -1,0 +1,16 @@
+{
+  "greeting": "Hello",
+  "farewell": "Goodbye",
+  "home": "Home",
+  "lastMinJob": "Last Minute Job",
+  "profile": "Profile",
+  "settings": "Settings",
+  "settingsScreen": {
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "settings": "Settings Screen",
+    "english": "English",
+    "french": "French",
+    "dutch": "Dutch"
+  }
+}

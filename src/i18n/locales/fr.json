@@ -1,0 +1,16 @@
+{
+  "greeting": "Bonjour",
+  "farewell": "Au revoir",
+  "home": "Accueil",
+  "lastMinJob": "Emploi de dernière minute",
+  "profile": "Profil",
+  "settings": "Paramètres",
+  "settingsScreen": {
+    "darkMode": "Mode Sombre",
+    "lightMode": "Mode Clair",
+    "settings": "Écran des Paramètres",
+    "english": "Anglais",
+    "french": "Français",
+    "dutch": "Néerlandais"
+  }
+}

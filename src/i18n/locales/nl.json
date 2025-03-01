@@ -1,0 +1,16 @@
+{
+  "greeting": "Hallo",
+  "farewell": "Vaarwel",
+  "home": "Thuis",
+  "lastMinJob": "Last Minute Baan",
+  "profile": "Profiel",
+  "settings": "Instellingen",
+  "settingsScreen": {
+    "darkMode": "Donkere Modus",
+    "lightMode": "Lichte Modus",
+    "settings": "Instellingen Scherm",
+    "english": "Engels",
+    "french": "Frans",
+    "dutch": "Nederlands"
+  }
+}
