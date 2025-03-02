@@ -1,4 +1,5 @@
 import { Appearance, StyleSheet } from 'react-native';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export const COLOR_SCHEMES = {
   LIGHT: 'light',
@@ -7,85 +8,132 @@ export const COLOR_SCHEMES = {
 
 export type ColorScheme = typeof COLOR_SCHEMES[keyof typeof COLOR_SCHEMES];
 
+// Primary brand colors
+const BRAND_PRIMARY = '#DE004D'; // Vibrant red accent
+const BRAND_SECONDARY = '#211547'; // Deep purple/navy
+
+// Enhanced color palette
 export const COLORS = {
   light: {
-    primary: '#2A6EF0',       
-    secondary: '#4ECDC4',     
-    background: '#F9FAFC',    // Soft off-white
-    surface: '#FFFFFF',       // Pure white
-    error: '#E74C3C',         // Alert red
+    // Core colors
+    primary: BRAND_PRIMARY,
+    secondary: BRAND_SECONDARY,
+    background: '#F9FAFC',
+    surface: '#FFFFFF',
+    error: '#E74C3C',
     
     // Text & borders
-    textPrimary: '#1A1F36',   // Deep navy
-    textSecondary: '#4A5568', // Medium gray
-    border: '#E2E8F0',        // Light gray
+    textPrimary: '#1E293B',
+    textSecondary: '#64748B',
+    border: '#E2E8F0',
+    shadow: '#1E293B',
     
     // Specials
-    accent: '#FF6B6B',        // Warm coral
-    success: '#10B981',       // Emerald green
-    warning: '#F59E0B',       // Amber
+    accent: BRAND_PRIMARY,
+    success: '#10B981',
+    warning: '#F59E0B',
+    info: '#3B82F6',
     
     // Navigation
-    tabActive: '#2A6EF0',     // Match primary
-    tabInactive: '#94A3B8',   // Cool gray
-    headerBg: '#FFFFFF',      // Match surface
-
-
+    tabActive: BRAND_PRIMARY,
+    tabInactive: '#94A3B8',
+    headerBg: '#FFFFFF',
+    
+    // Gradient options
+    gradientStart: '#FFFFFF',
+    gradientEnd: '#F1F5F9',
   },
   dark: {
     // Core colors
-    primary: '#4ECDC4',       // Teal from light secondary
-    secondary: '#2A6EF0',     // Blue from light primary
-    background: '#1A1F36',    // Deep navy
-    surface: '#2D3748',       // Dark slate
-    error: '#EF4444',         // Bright red
+    primary: BRAND_PRIMARY,
+    secondary: '#6366F1',
+    background: '#0F172A',
+    surface: '#1E293B',
+    error: '#EF4444',
     
     // Text & borders
-    textPrimary: '#F8FAFC',    // Off-white
-    textSecondary: '#CBD5E0',  // Light gray
-    border: '#475569',         // Medium slate
+    textPrimary: '#F8FAFC',
+    textSecondary: '#CBD5E0',
+    border: '#334155',
+    shadow: '#000000',
     
     // Specials
-    accent: '#FF6B6B',         // Same coral for consistency
-    success: '#10B981',        // Same emerald
-    warning: '#F59E0B',        // Same amber
+    accent: BRAND_PRIMARY,
+    success: '#10B981',
+    warning: '#F59E0B',
+    info: '#3B82F6',
     
-
+    // Navigation
+    tabActive: BRAND_PRIMARY,
+    tabInactive: '#64748B',
+    headerBg: '#1E293B',
+    
+    // Gradient options
+    gradientStart: '#0F172A',
+    gradientEnd: BRAND_SECONDARY,
   },
 };
 
-import React from 'react';
 type ThemeContextType = {
   isDark: boolean;
   colors: typeof COLORS.light;
   setScheme: (scheme: ColorScheme) => void;
+  useGradient: boolean;
+  toggleGradient: () => void;
 };
 
-export const ThemeContext = React.createContext<ThemeContextType>({
+export const ThemeContext = createContext<ThemeContextType>({
   isDark: false,
   colors: COLORS.light,
   setScheme: () => {},
+  useGradient: false,
+  toggleGradient: () => {},
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [colorScheme, setColorScheme] = React.useState<ColorScheme>(
+  // Initialize with device preference
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(
     Appearance.getColorScheme() || COLOR_SCHEMES.LIGHT
   );
+  
+  // Gradient toggle state
+  const [useGradient, setUseGradient] = useState(false);
+  
+  // Listen for system theme changes
+  useEffect(() => {
+    const subscription = Appearance.addChangeListener(({ colorScheme: newColorScheme }) => {
+      if (newColorScheme) {
+        setColorScheme(newColorScheme as ColorScheme);
+      }
+    });
+    
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const setScheme = (scheme: ColorScheme) => {
     setColorScheme(scheme);
+  };
+  
+  const toggleGradient = () => {
+    setUseGradient(prev => !prev);
   };
 
   const isDark = colorScheme === COLOR_SCHEMES.DARK;
   const colors = isDark ? COLORS.dark : COLORS.light;
 
   return (
-    <ThemeContext.Provider value={{ isDark, colors, setScheme }}>
+    <ThemeContext.Provider value={{ isDark, colors, setScheme, useGradient, toggleGradient }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
 // Hook for easy theme access
-export const useTheme = () => React.useContext(ThemeContext);
+export const useTheme = () => useContext(ThemeContext);
 
+// Utility function to get responsive sizes
+export const getResponsiveSize = (size: number, screenDimension: number) => {
+  return screenDimension * (size / 100);
+};

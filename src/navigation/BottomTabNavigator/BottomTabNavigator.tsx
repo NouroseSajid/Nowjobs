@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../theme/theme';
-import { TAB_BAR_CONFIG, HEADER_CONFIG, TAB_SCREENS } from '../navigation-constants'; // Update import to use JS version
-import { IconProps } from '../../types/global'; // Import IconProps from global.d.ts
+import { TAB_BAR_CONFIG, HEADER_CONFIG, TAB_SCREENS } from '../navigation-constants';
+import { IconProps } from '../../types/global';
 
 // Import your icon components
 import { ApplicationIcon, HomeIcon, VacanciesIcon, ChatIcon, PlanningIcon } from '../../assets/icons/bottom-tab-navigator-icons';
@@ -18,6 +18,7 @@ type BottomTabParamList = {
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const ICON_COMPONENTS = {
   Home: HomeIcon,
@@ -28,16 +29,17 @@ const ICON_COMPONENTS = {
 };
 
 const BottomTabNavigation: React.FC = () => {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused }: IconProps) => {
+          tabBarIcon: ({ focused }) => {
             const IconComponent = ICON_COMPONENTS[route.name] || HomeIcon;
             return (
-              <IconComponent />
+              <IconComponent focused={focused} />
             );
           },
           tabBarActiveTintColor: colors.tabActive,
@@ -47,14 +49,28 @@ const BottomTabNavigation: React.FC = () => {
             height: TAB_BAR_CONFIG.height,
             paddingBottom: TAB_BAR_CONFIG.paddingBottom,
             borderTopColor: colors.border,
+            borderTopWidth: 1,
+            elevation: isDark ? 8 : 4,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
           },
           headerStyle: {
             backgroundColor: colors.headerBg,
             borderBottomColor: colors.border,
+            borderBottomWidth: 1,
             height: HEADER_CONFIG.height,
+            elevation: isDark ? 8 : 4,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
           },
           headerTitleStyle: {
             color: colors.textPrimary,
+            fontSize: SCREEN_WIDTH * 0.045, // Responsive font size
+            fontWeight: '600',
           },
         })}
       >
@@ -64,7 +80,7 @@ const BottomTabNavigation: React.FC = () => {
             name={screen.name}
             component={screen.component}
             options={{
-              title: i18next.t(screen.translationKey, { defaultValue: screen.name }),
+              title: t(screen.translationKey, { defaultValue: screen.name }),
               headerShown: screen.showHeader,
             }}
           />

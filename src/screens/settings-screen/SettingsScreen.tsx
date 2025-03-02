@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, Switch } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet, Switch, Dimensions, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme, COLOR_SCHEMES } from '../../theme/theme';
 import { changeLanguage, getCurrentLanguage, SupportedLanguage } from '../../i18n';
+import { LinearGradient } from 'react-native-linear-gradient';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const SettingsScreen: React.FC = () => {
-    const { colors, isDark, setScheme } = useTheme();
+    const { colors, isDark, setScheme, useGradient, toggleGradient } = useTheme();
     const { t } = useTranslation();
     const [currentLang, setCurrentLang] = useState<SupportedLanguage>(getCurrentLanguage() as SupportedLanguage);
     
-    const styles = dynamicStyles(colors);
+    const styles = dynamicStyles(colors, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Handle language change
     const handleLanguageChange = async (lng: SupportedLanguage) => {
@@ -17,94 +20,141 @@ const SettingsScreen: React.FC = () => {
         setCurrentLang(lng);
     };
 
+    const Container = useGradient ? LinearGradient : View;
+    const containerProps = useGradient ? {
+        colors: [colors.gradientStart, colors.gradientEnd],
+        start: { x: 0, y: 0 },
+        end: { x: 0, y: 1 },
+        style: styles.container
+    } : {
+        style: styles.container
+    };
+
     return (
-        <View style={styles.container}>
-            <View style={styles.switchContainer}>
-                <Switch
-                    value={isDark}
-                    onValueChange={(value) => {
-                        setScheme(value ? COLOR_SCHEMES.DARK : COLOR_SCHEMES.LIGHT);
-                    }}
-                />
-                <Text style={styles.switchLabel}>
-                    {isDark ? t('settingsScreen.darkMode') : t('settingsScreen.lightMode')}
-                </Text>
-            </View>
-            
-            <Text style={styles.headerText}>{t('settingsScreen.settings')}</Text>
-            
-            <View style={styles.languageContainer}>
-                <Text style={styles.languageTitle}>{t('settings')}</Text>
-                
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title={t('settingsScreen.english')}
-                        onPress={() => handleLanguageChange('en')}
-                        color={currentLang === 'en' ? colors.accent : colors.primary}
-                    />
+        <Container {...containerProps}>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <View style={styles.card}>
+                    <Text style={styles.headerText}>{t('settingsScreen.settings')}</Text>
+                    
+                    <View style={styles.optionContainer}>
+                        <Text style={styles.optionLabel}>{isDark ? t('settingsScreen.darkMode') : t('settingsScreen.lightMode')}</Text>
+                        <Switch
+                            value={isDark}
+                            onValueChange={(value) => {
+                                setScheme(value ? COLOR_SCHEMES.DARK : COLOR_SCHEMES.LIGHT);
+                            }}
+                            trackColor={{ false: '#767577', true: `${colors.primary}80` }}
+                            thumbColor={isDark ? colors.primary : '#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                        />
+                    </View>
+
+                    <View style={styles.optionContainer}>
+                        <Text style={styles.optionLabel}>Use Gradient Background</Text>
+                        <Switch
+                            value={useGradient}
+                            onValueChange={toggleGradient}
+                            trackColor={{ false: '#767577', true: `${colors.primary}80` }}
+                            thumbColor={useGradient ? colors.primary : '#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                        />
+                    </View>
                 </View>
                 
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title={t('settingsScreen.french')}
-                        onPress={() => handleLanguageChange('fr')}
-                        color={currentLang === 'fr' ? colors.accent : colors.primary}
-                    />
+                <View style={styles.card}>
+                    <Text style={styles.sectionTitle}>{t('settings')}</Text>
+                    
+                    <View style={styles.languageButtonsContainer}>
+                        <View style={[
+                            styles.languageButton, 
+                            currentLang === 'en' && { backgroundColor: `${colors.primary}15` }
+                        ]}>
+                            <Button
+                                title={t('settingsScreen.english')}
+                                onPress={() => handleLanguageChange('en')}
+                                color={currentLang === 'en' ? colors.primary : colors.textSecondary}
+                            />
+                        </View>
+                        
+                        <View style={[
+                            styles.languageButton, 
+                            currentLang === 'fr' && { backgroundColor: `${colors.primary}15` }
+                        ]}>
+                            <Button
+                                title={t('settingsScreen.french')}
+                                onPress={() => handleLanguageChange('fr')}
+                                color={currentLang === 'fr' ? colors.primary : colors.textSecondary}
+                            />
+                        </View>
+                        
+                        <View style={[
+                            styles.languageButton, 
+                            currentLang === 'nl' && { backgroundColor: `${colors.primary}15` }
+                        ]}>
+                            <Button
+                                title={t('settingsScreen.dutch')}
+                                onPress={() => handleLanguageChange('nl')}
+                                color={currentLang === 'nl' ? colors.primary : colors.textSecondary}
+                            />
+                        </View>
+                    </View>
                 </View>
-                
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title={t('settingsScreen.dutch')}
-                        onPress={() => handleLanguageChange('nl')}
-                        color={currentLang === 'nl' ? colors.accent : colors.primary}
-                    />
-                </View>
-            </View>
-        </View>
+            </ScrollView>
+        </Container>
     );
 };
 
-const dynamicStyles = (colors: any) => StyleSheet.create({
+const dynamicStyles = (colors: any, screenWidth: number, screenHeight: number) => StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: colors.background,
-        padding: 20,
+    },
+    scrollContent: {
+        padding: screenWidth * 0.05,
+        paddingBottom: screenHeight * 0.1,
+    },
+    card: {
+        backgroundColor: colors.surface,
+        borderRadius: 12,
+        padding: screenWidth * 0.05,
+        marginBottom: screenHeight * 0.02,
+        shadowColor: colors.shadow,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 4,
     },
     headerText: {
-        fontSize: 24,
+        fontSize: screenWidth * 0.06,
         fontWeight: 'bold',
         color: colors.textPrimary,
-        marginBottom: 30,
+        marginBottom: screenHeight * 0.02,
     },
-    switchContainer: {
+    sectionTitle: {
+        fontSize: screenWidth * 0.05,
+        fontWeight: 'bold',
+        color: colors.textPrimary,
+        marginBottom: screenHeight * 0.02,
+    },
+    optionContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 30,
+        paddingVertical: screenHeight * 0.015,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
     },
-    switchLabel: {
-        fontSize: 18,
-        color: colors.textPrimary,
-        marginLeft: 10,
-    },
-    text: {
-        fontSize: 18,
+    optionLabel: {
+        fontSize: screenWidth * 0.04,
         color: colors.textPrimary,
     },
-    languageContainer: {
-        width: '100%',
-        alignItems: 'center',
+    languageButtonsContainer: {
+        marginTop: screenHeight * 0.01,
     },
-    languageTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: colors.textPrimary,
-        marginBottom: 15,
-    },
-    buttonContainer: {
-        margin: 10,
-        width: 150,
+    languageButton: {
+        marginVertical: screenHeight * 0.01,
+        borderRadius: 8,
+        overflow: 'hidden',
     },
 });
 
