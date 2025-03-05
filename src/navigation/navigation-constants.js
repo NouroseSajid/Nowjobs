@@ -10,6 +10,9 @@ import VacanciesScreen from '../screens/bottom-five-screens/vacancies-screen';
 import ApplicationScreen from '../screens/bottom-five-screens/application-screen';
 import ChatScreen from '../screens/bottom-five-screens/chat-screen';
 import PlanningScreen from '../screens/bottom-five-screens/planning-screen';
+import LoginScreen from '../screens/login-screen/LoginScreen';
+
+
 import StackNavigator from '../navigation/stack-navigator/index';
 
 // Define constants
@@ -76,6 +79,12 @@ export const STACK_SCREENS = [
     name: 'Settings',
     component: SettingsScreen,
     translationKey: 'settings',
+  },
+  
+  { 
+    name: 'LoginScreen',
+    component: LoginScreen,
+    translationKey: 'loginScreen',
   },
 ];
 

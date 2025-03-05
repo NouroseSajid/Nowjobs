@@ -26,7 +26,6 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles(colors).todoItem}>
-            {/* Render individual todo item if needed */}
           </View>
         )}
       />
@@ -42,6 +41,13 @@ const HomeScreen = ({ navigation }) => {
         <Button
           title={i18next.t('settings', { defaultValue: 'Settings' }) || 'Settings'}
           onPress={() => navigation.navigate('Settings')}
+          color={colors.primary}
+        />
+      </View>
+      <View style={styles(colors).buttonContainer}>
+        <Button
+          title={i18next.t('LoginScreen', { defaultValue: 'LoginScreen' }) || 'LoginInScreen'}
+          onPress={() => navigation.navigate('LoginScreen')}
           color={colors.primary}
         />
       </View>
