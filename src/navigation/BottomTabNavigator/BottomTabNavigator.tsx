@@ -1,23 +1,14 @@
 import React from 'react';
+import { useAuth } from '../../../context/AuthContext';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../theme/theme';
 import { TAB_BAR_CONFIG, HEADER_CONFIG, TAB_SCREENS } from '../navigation-constants';
-import { IconProps } from '../../types/global';
+import { IconProps } from '../../../types/global';
+import { ApplicationIcon, HomeIcon, VacanciesIcon, ChatIcon, PlanningIcon } from '../../../assets/icons/bottom-tab-navigator-icons';
 
-// Import your icon components
-import { ApplicationIcon, HomeIcon, VacanciesIcon, ChatIcon, PlanningIcon } from '../../assets/icons/bottom-tab-navigator-icons';
-
-type BottomTabParamList = {
-  Home: undefined;
-  Vacancies: undefined;
-  Application: undefined;
-  Chat: undefined;
-  Planning: undefined;
-};
-
-const Tab = createBottomTabNavigator<BottomTabParamList>();
+const Tab = createBottomTabNavigator();
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const ICON_COMPONENTS = {
@@ -31,6 +22,11 @@ const ICON_COMPONENTS = {
 const BottomTabNavigation: React.FC = () => {
   const { colors, isDark } = useTheme();
   const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const filteredScreens = TAB_SCREENS.filter(screen => 
+    !screen.requiresAuth || (screen.requiresAuth && user)
+  );
 
   return (
     <View style={styles.container}>
@@ -38,9 +34,7 @@ const BottomTabNavigation: React.FC = () => {
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused }) => {
             const IconComponent = ICON_COMPONENTS[route.name] || HomeIcon;
-            return (
-              <IconComponent focused={focused} />
-            );
+            return <IconComponent focused={focused} />;
           },
           tabBarActiveTintColor: colors.tabActive,
           tabBarInactiveTintColor: colors.tabInactive,
@@ -69,12 +63,12 @@ const BottomTabNavigation: React.FC = () => {
           },
           headerTitleStyle: {
             color: colors.textPrimary,
-            fontSize: SCREEN_WIDTH * 0.045, // Responsive font size
+            fontSize: SCREEN_WIDTH * 0.045,
             fontWeight: '600',
           },
         })}
       >
-        {TAB_SCREENS.map(screen => (
+        {filteredScreens.map(screen => (
           <Tab.Screen
             key={screen.name}
             name={screen.name}

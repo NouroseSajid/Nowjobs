@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../theme/theme';
 import { LinearGradient } from 'react-native-linear-gradient';
 
+
 const Stack = createStackNavigator();
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 

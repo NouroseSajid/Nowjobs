@@ -15,6 +15,9 @@ import LoginScreen from '../screens/login-screen/LoginScreen';
 
 import StackNavigator from '../navigation/stack-navigator/index';
 
+import ProtectedScreen from '../../compoments/global-components/ProtectedScreen';
+
+
 // Define constants
 const ICON_SIZE = 24;
 const ICON_STROKE_WIDTH = 2;
@@ -66,6 +69,15 @@ export const STACK_SCREENS = [
     options: { headerShown: false }
   },
   { 
+    name: 'Profile',
+    component: (props: any) => (
+      <ProtectedScreen>
+        <ProfileScreen {...props} />
+      </ProtectedScreen>
+    ),
+    translationKey: 'profile',
+  },
+  { 
     name: 'backupJobs',
     component: BackupJobs,
     translationKey: 'backupJobs',
@@ -81,11 +93,6 @@ export const STACK_SCREENS = [
     translationKey: 'settings',
   },
   
-  { 
-    name: 'LoginScreen',
-    component: LoginScreen,
-    translationKey: 'loginScreen',
-  },
 ];
 
 export const TAB_SCREENS = [
@@ -93,26 +100,31 @@ export const TAB_SCREENS = [
     name: 'Home',
     component: StackNavigator,
     translationKey: 'home',
-    showHeader: false
+    showHeader: false,
+    requiresAuth: false // Public screen
   },
   { 
     name: 'Vacancies',
     component: VacanciesScreen,
     translationKey: 'vacancies',
+    requiresAuth: true
   },
   { 
     name: 'Application',
     component: ApplicationScreen,
     translationKey: 'application',
+    requiresAuth: true
   },
   { 
     name: 'Planning',
     component: PlanningScreen,
     translationKey: 'planning',
+    requiresAuth: true
   },
   { 
     name: 'Chat',
     component: ChatScreen,
     translationKey: 'chat',
+    requiresAuth: true
   },
 ];

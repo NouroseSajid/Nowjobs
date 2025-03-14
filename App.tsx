@@ -1,19 +1,15 @@
 import React from 'react';
-import { SafeAreaView, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import './src/i18n';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from './src/theme/theme';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
+import CustomStatusBar from './src/compoments/global-components/CustomStatusBar';
 
 const App: React.FC = () => {
   return (
     <>
-      <StatusBar
-        barStyle={'dark-content'}
-        backgroundColor={'#fff'}
-        translucent={false}
-
-      />
+      <CustomStatusBar />
       <SafeAreaView style={{ flex: 1 }}>
         <ThemeProvider>
           <NavigationContainer>
@@ -24,4 +20,5 @@ const App: React.FC = () => {
     </>
   );
 };
+
 export default App;
