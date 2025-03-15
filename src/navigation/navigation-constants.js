@@ -15,7 +15,7 @@ import LoginScreen from '../screens/login-screen/LoginScreen';
 
 import StackNavigator from '../navigation/stack-navigator/index';
 
-import ProtectedScreen from '../../compoments/global-components/ProtectedScreen';
+import ProtectedScreen from '../compoments/global-components/ProtectedScreen';
 
 
 // Define constants

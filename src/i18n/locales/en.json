@@ -6,12 +6,31 @@
   "profile": "Profile",
   "settings": "Settings",
   "loginScreen": "Login Screen",
+  "vacancies": "Vacancies",
+  "application": "Application",
+  "planning": "Planning",
+  "chat": "Chat",
+  "backupJobs": "Backup Jobs",
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "enterEmail": "Enter email",
+    "enterPassword": "Enter password",
+    "loginFailed": "Login failed. Please check your credentials.",
+    "logout": "Logout"
+  },
   "settingsScreen": {
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "settings": "Settings Screen",
     "english": "English",
     "french": "French",
-    "dutch": "Dutch"
+    "dutch": "Dutch",
+    "useGradient": "Use Gradient"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "sessionExpired": "Your session has expired"
   }
 }

@@ -1,50 +1,62 @@
-// src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as authService from '../api/authService';
+import { fetchUser } from '../api/authService';
 
 type User = {
+  id: string;
+  email: string;
   name: string;
-  type: string;
+
+
+
+
+
+
+  // Add other user properties as needed
+
+
+
+
+
+  // For example:
+  // role: 'admin' | 'user';
 } | null;
 
 type AuthContextType = {
   user: User;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  setUser: (user: User) => void;
+  checkAuth: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isLoading: true,
+  setUser: () => {},
+  checkAuth: async () => {},
+});
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const checkAuth = async () => {
-    setIsLoading(true);
     try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) return;
+      setIsLoading(true);
+      const token = await AsyncStorage.getItem('token');
       
-      const userData = await authService.fetchUser(token);
-      setUser(userData);
+      if (token) {
+        const userData = await fetchUser(token);
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
     } catch (error) {
-      await authService.logout();
+      console.error('Authentication check failed:', error);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleLogin = async (email: string, password: string) => {
-    const token = await authService.login(email, password);
-    const userData = await authService.fetchUser(token);
-    setUser(userData);
-  };
-
-  const handleLogout = async () => {
-    await authService.logout();
-    setUser(null);
   };
 
   useEffect(() => {
@@ -52,14 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        login: handleLogin,
-        logout: handleLogout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, isLoading, setUser, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
