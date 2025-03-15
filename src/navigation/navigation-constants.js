@@ -83,9 +83,9 @@ export const STACK_SCREENS = [
     translationKey: 'backupJobs',
   },
   { 
-    name: 'Profile',
-    component: ProfileScreen,
-    translationKey: 'profile',
+    name: 'LoginScreen',
+    component: LoginScreen,
+    translationKey: 'loginScreen',
   },
   { 
     name: 'Settings',

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ActivityIndicator, Alert, Button } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { AuthForm } from '../../compoments/global-components/AuthForm';
+import { useTheme } from '../../theme/theme';
 
 export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { user, isLoading, login, logout } = useAuth();
+  const { colors } = useTheme();
 
   const handleLogin = async () => {
     try {
@@ -18,21 +20,21 @@ export const LoginScreen = () => {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
+    <View style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: colors.background }}>
       {user ? (
         <View>
-          <Text style={{ fontSize: 18, textAlign: 'center', marginBottom: 20 }}>
+          <Text style={{ fontSize: 18, textAlign: 'center', marginBottom: 20, color: colors.textPrimary }}>
             Welcome, {user.name}
-            type: {user.type}
+            
           </Text>
-          <Button title="Logout" onPress={logout} />
+          <Button title="Logout" onPress={logout} color={colors.primary} />
         </View>
       ) : (
         <AuthForm
@@ -46,3 +48,5 @@ export const LoginScreen = () => {
     </View>
   );
 };
+
+export default LoginScreen;

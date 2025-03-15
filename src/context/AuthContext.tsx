@@ -19,7 +19,6 @@ type User = {
 
 
   // For example:
-  // role: 'admin' | 'user';
 } | null;
 
 type AuthContextType = {

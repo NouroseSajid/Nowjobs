@@ -16,7 +16,7 @@ export const isValidEmail = (email: string): boolean => {
    * @returns Boolean indicating if password meets requirements
    */
   export const isValidPassword = (password: string): boolean => {
-    return password.length >= 8;
+    return password.length >= 5;
   };
   
   /**

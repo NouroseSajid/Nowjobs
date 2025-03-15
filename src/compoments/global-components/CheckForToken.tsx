@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../theme/theme';
@@ -11,23 +10,16 @@ const CheckForToken: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const { colors } = useTheme();
 
   useEffect(() => {
-    // Check for token on component mount
-    const verifyToken = async () => {
-      await checkAuth();
-    };
-
-    verifyToken();
+    checkAuth();
   }, []);
 
   useEffect(() => {
-    // Redirect based on authentication status
-    if (!isLoading) {
-      if (!user) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'LoginScreen' }],
-        });
-      }
+    if (!isLoading && !user) {
+      // Only navigate if we're done loading and there's no user
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'LoginScreen' }],
+      });
     }
   }, [user, isLoading, navigation]);
 
@@ -39,6 +31,7 @@ const CheckForToken: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     );
   }
 
+  // If there's a user or we're navigating to LoginScreen, render children
   return <>{children}</>;
 };
 
