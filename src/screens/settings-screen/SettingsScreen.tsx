@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, Switch, Dimensions, ScrollView } from 'react-native';
+import { View, Text, Button, StyleSheet, Switch, Dimensions, ScrollView, BackHandler } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useTheme, COLOR_SCHEMES } from '../../theme/theme';
+import { useTheme } from '../../theme/theme';
+import { useAuth } from '../../context/AuthContext';
 import { changeLanguage, getCurrentLanguage, SupportedLanguage } from '../../i18n';
 import { LinearGradient } from 'react-native-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const SettingsScreen: React.FC = () => {
     const { colors, isDark, setScheme, useGradient, toggleGradient } = useTheme();
     const { t } = useTranslation();
+    const { logout } = useAuth();
     const [currentLang, setCurrentLang] = useState<SupportedLanguage>(getCurrentLanguage() as SupportedLanguage);
+    const navigation = useNavigation();
+    const LOGOUT_BEHAVIOR = 1; // 0: exit app, 1: go to LoginScreen
     
     const styles = dynamicStyles(colors, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -18,6 +23,15 @@ const SettingsScreen: React.FC = () => {
     const handleLanguageChange = async (lng: SupportedLanguage) => {
         await changeLanguage(lng);
         setCurrentLang(lng);
+    };
+
+    const handleLogout = async () => {
+        await logout();
+        if (LOGOUT_BEHAVIOR === 0) {
+            BackHandler.exitApp();
+        } else {
+            navigation.navigate("LoginScreen");
+        }
     };
 
     const Container = useGradient ? LinearGradient : View;
@@ -98,6 +112,15 @@ const SettingsScreen: React.FC = () => {
                             />
                         </View>
                     </View>
+                    
+                    {/* Updated Logout Button */}
+                    <View style={styles.logoutButtonContainer}>
+                        <Button
+                            title={t('auth.logout')}
+                            onPress={handleLogout}
+                            color={colors.primary}
+                        />
+                    </View>
                 </View>
             </ScrollView>
         </Container>
@@ -155,6 +178,9 @@ const dynamicStyles = (colors: any, screenWidth: number, screenHeight: number) =
         marginVertical: screenHeight * 0.01,
         borderRadius: 8,
         overflow: 'hidden',
+    },
+    logoutButtonContainer: {
+        marginTop: screenHeight * 0.02,
     },
 });
 

@@ -1,28 +1,17 @@
+
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
 
-const { user} = useAuth();
-
 const VacanciesScreen = () => {
+  const { user } = useAuth();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Vacancies Screen</Text>
-      <Text style={styles.text}>{user.name}</Text>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Vacancies Screen</Text>
+      <Text style={{ fontSize: 18 }}>{user?.name || 'Loading...'}</Text>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-});
 
 export default VacanciesScreen;

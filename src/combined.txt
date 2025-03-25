@@ -1,0 +1,2009 @@
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\api\authService.tsx
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = "http://192.168.0.110:3000";
+
+export const login = async (email: string, password: string) => {
+  const response = await axios.post(`${API_URL}/login`, { email, password });
+  await AsyncStorage.setItem("token", response.data.token);
+  return response.data.token;
+};
+
+export const fetchUser = async (token: string) => {
+  const response = await axios.get(`${API_URL}/user`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const logout = async () => {
+  await AsyncStorage.removeItem("token");
+};
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\assets\icons\bottom-tab-navigator-icons\ApplicationIcon.tsx
+import * as React from "react";
+import Svg, { Path, Rect } from "react-native-svg";
+import withIconProps, { IconProps } from "./withIconProps";
+
+const ApplicationIcon: React.FC<IconProps> = (props) => (
+  <Svg
+    viewBox="0 0 100.04 109.64"
+    {...props}
+  >
+    {/* Primary stroke elements */}
+    <Path
+      d="M60.33 19.07h30.28a7.86 7.86 0 0 1 7.93 7.78v73.51a7.85 7.85 0 0 1-7.93 7.78h-47a7.85 7.85 0 0 1-7.93-7.78V76.87"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M60.33 11.09c.57 31.87-36.66 36.54-47.17 14a31.6 31.6 0 0 1-2.72-14Z"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M60.33 68.64c.57-31.86-36.66-36.53-47.17-14a31.5 31.5 0 0 0-2.72 14Z"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Rect
+      x="2.9"
+      y="2.87"
+      width="65.62"
+      height="8.22"
+      rx="2.83"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Rect
+      x="3.6"
+      y="68.82"
+      width="65.62"
+      height="8.22"
+      rx="2.83"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    {/* Secondary stroke elements */}
+    <Path
+      d="M58.95 9.72c.57 31.87-36.62 36.57-47.16 14.01a31.6 31.6 0 0 1-2.73-14Z"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M58.95 67.29c.57-31.88-36.62-36.55-47.16-14a31.5 31.5 0 0 0-2.73 14Z"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Rect
+      x="1.5"
+      y="1.5"
+      width="65.63"
+      height="8.22"
+      rx="2.83"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Rect
+      x="2.2"
+      y="67.45"
+      width="65.63"
+      height="8.22"
+      rx="2.83"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M58.96 16.59h30.26a7.85 7.85 0 0 1 7.93 7.78v73.51a7.85 7.85 0 0 1-7.93 7.78h-47a7.85 7.85 0 0 1-7.89-7.78v-23.5"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+  </Svg>
+);
+
+export default withIconProps(ApplicationIcon);
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\assets\icons\bottom-tab-navigator-icons\ChatIcon.tsx
+import * as React from "react";
+import Svg, { Path } from "react-native-svg";
+import withIconProps, { IconProps } from "./withIconProps";
+
+const ChatIcon: React.FC<IconProps> = (props) => (
+  <Svg
+    viewBox="0 0 108.28 102.87"
+    {...props}
+  >
+    {/* Primary stroke elements */}
+    <Path
+      d="M85.02 23.38c0 11.53-18.48 20.86-41.26 20.86a73.6 73.6 0 0 1-21.23-3c-1.82-.56-3.55-1.18-5.17-1.86s-18 13.44-4.82-2.4a30.4 30.4 0 0 1-4-2.78c-3.83-3.17-6-6.89-6-10.87C2.54 11.8 21.01 2.45 43.8 2.45s41.22 9.4 41.22 20.93ZM24.26 80.24c0 11.53 18.48 20.88 41.26 20.88a73.6 73.6 0 0 0 21.23-3 52 52 0 0 0 5.18-1.88c1.73-.73 18 13.44 4.81-2.39a30.4 30.4 0 0 0 4-2.78c3.83-3.17 6-6.89 6-10.87 0-11.53-18.47-20.87-41.26-20.87s-41.22 9.33-41.22 20.91Z"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+
+    {/* Secondary stroke elements */}
+    <Path
+      d="M84.02 22.38c0 11.53-18.48 20.86-41.26 20.86a73.6 73.6 0 0 1-21.23-3c-1.82-.56-3.55-1.18-5.17-1.86s-18 13.44-4.82-2.4a30.4 30.4 0 0 1-4.01-2.74c-3.83-3.17-6-6.89-6-10.87C1.53 10.84 20 1.49 42.79 1.49s41.23 9.36 41.23 20.89ZM23.26 79.24c0 11.53 18.48 20.88 41.26 20.88a73.6 73.6 0 0 0 21.23-3 52 52 0 0 0 5.18-1.88c1.73-.73 18 13.44 4.81-2.39a30.4 30.4 0 0 0 4-2.78c3.83-3.17 6-6.89 6-10.87 0-11.53-18.47-20.87-41.26-20.87s-41.22 9.33-41.22 20.91Z"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+  </Svg>
+);
+
+export default withIconProps(ChatIcon);
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\assets\icons\bottom-tab-navigator-icons\HomeIcon.tsx
+import * as React from "react";
+import Svg, { Path } from "react-native-svg";
+import withIconProps, { IconProps } from "./withIconProps";
+
+const HomeIcon: React.FC<IconProps> = (props) => (
+  <Svg
+    viewBox="0 0 105.68 111.56"
+    {...props}
+  >
+    {/* Primary stroke elements */}
+    <Path
+      d="M14.16 56.75h78.48v50.47a2.83 2.83 0 0 1-2.83 2.83H17a2.83 2.83 0 0 1-2.83-2.83V56.75Z"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M55.36 4.41 7.42 52.87a2.83 2.83 0 0 0 2 4.82h95.87a2.83 2.83 0 0 0 2-4.82L59.39 4.41a2.84 2.84 0 0 0-4.03 0Z"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M49.3 81.92h8.21A5.52 5.52 0 0 1 63 87.44v21.13H43.78V87.44a5.52 5.52 0 0 1 5.52-5.52Z"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+
+    {/* Secondary stroke elements */}
+    <Path
+      d="M13 55.62h78.51v50.47a2.83 2.83 0 0 1-2.83 2.83H15.87a2.83 2.83 0 0 1-2.87-2.83V55.62Z"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M54.23 3.29 6.29 51.74a2.83 2.83 0 0 0 2 4.82h95.87a2.83 2.83 0 0 0 2-4.82L58.26 3.29a2.82 2.82 0 0 0-4.03 0Z"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M48.17 80.79h8.21a5.52 5.52 0 0 1 5.52 5.52v21.13H42.65V86.31a5.52 5.52 0 0 1 5.52-5.52Z"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+  </Svg>
+);
+
+export default withIconProps(HomeIcon);
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\assets\icons\bottom-tab-navigator-icons\index.js
+import ApplicationIcon from "./ApplicationIcon";
+import HomeIcon from "./HomeIcon";
+import VacanciesIcon from "./VacanciesIcon"; // Corrected the import statement
+import ChatIcon from "./ChatIcon";
+import PlanningIcon from "./PlanningIcon";
+
+export { ApplicationIcon, HomeIcon, VacanciesIcon, ChatIcon, PlanningIcon };
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\assets\icons\bottom-tab-navigator-icons\PlanningIcon.tsx
+import * as React from "react";
+import Svg, { Path } from "react-native-svg";
+import withIconProps, { IconProps } from "./withIconProps";
+
+const PlanningIcon: React.FC<IconProps> = (props) => (
+  <Svg
+    viewBox="0 0 109.78 95.27"
+    {...props}
+  >
+    {/* Primary stroke elements */}
+    <Path
+      d="M2.5 39h105.78v51.93a2.83 2.83 0 0 1-2.83 2.83H5.33a2.83 2.83 0 0 1-2.83-2.83V39Z"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M91 2.5h2.5a2 2 0 0 1 2 2v6.58H89V4.5a2 2 0 0 1 2-2ZM15.54 2.5h1.72a2 2 0 0 1 2 2v6.58h-5.72V4.5a2 2 0 0 1 2-2Z"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M2.5 39.04V17.76a4.05 4.05 0 0 1 4.05-4.05h97.73a4.05 4.05 0 0 1 4 4.05v21.28"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+
+    {/* Secondary stroke elements */}
+    <Path
+      d="M1.5 38h105.78v51.93a2.83 2.83 0 0 1-2.83 2.83H4.33a2.83 2.83 0 0 1-2.83-2.83V38Z"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M90 1.5h2.5a2 2 0 0 1 2 2v6.58H88V3.5a2 2 0 0 1 2-2ZM14.54 1.5h1.72a2 2 0 0 1 2 2v6.58h-5.72V3.5a2 2 0 0 1 2-2Z"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M1.5 38.04V16.76a4.05 4.05 0 0 1 4.05-4.05h97.73a4.05 4.05 0 0 1 4 4.05v21.28"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+  </Svg>
+);
+
+export default withIconProps(PlanningIcon);
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\assets\icons\bottom-tab-navigator-icons\VacanciesIcon.tsx
+import * as React from "react";
+import Svg, { Rect, Path } from "react-native-svg";
+import withIconProps, { IconProps } from "./withIconProps";
+
+const VacanciesIcon: React.FC<IconProps> = (props) => (
+  <Svg
+    viewBox="0 0 106.97 109.76"
+    {...props}
+  >
+    {/* Primary stroke elements */}
+    <Rect
+      x="23.07"
+      y="13.03"
+      width="61.32"
+      height="88.57"
+      rx="2.83"
+      transform="rotate(-30 48.74 62.4)"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M65.27 19.69h36.33a3.87 3.87 0 0 1 3.87 3.87v80.84a3.86 3.86 0 0 1-3.87 3.86H48.01a3.82 3.82 0 0 1-3-1.38"
+      fill={props.primaryFill}
+      stroke={props.primaryStroke}
+      strokeWidth={props.primaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+
+    {/* Secondary stroke elements */}
+    <Rect
+      x="21.71"
+      y="11.67"
+      width="61.32"
+      height="88.57"
+      rx="2.83"
+      transform="rotate(-30 47.385 61.037)"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+    <Path
+      d="M63.91 18.33h36.33a3.86 3.86 0 0 1 3.86 3.86v80.85a3.86 3.86 0 0 1-3.86 3.86H46.65a3.89 3.89 0 0 1-3-1.38"
+      fill={props.secondaryFill}
+      stroke={props.secondaryStroke}
+      strokeWidth={props.secondaryStrokeWidth}
+      strokeMiterlimit={10}
+    />
+  </Svg>
+);
+
+export default withIconProps(VacanciesIcon);
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\assets\icons\bottom-tab-navigator-icons\withIconProps.tsx
+import * as React from "react";
+import { IconProps } from "../../../types/global";
+import { useTheme } from "../../../theme/theme";
+
+const withIconProps = (WrappedComponent: React.FC<IconProps>) => {
+  const EnhancedComponent: React.FC<IconProps> = ({
+    width = 24,
+    height = 24,
+    primaryFill = "none",
+    secondaryFill = "none",
+    primaryStroke,
+    secondaryStroke,
+    primaryStrokeWidth = 3,
+    secondaryStrokeWidth = 3,
+    focused = false,
+    ...props
+  }) => {
+    const { colors } = useTheme();
+    
+    // Use theme colors based on focus state
+    const activePrimaryStroke = focused ? colors.tabActive : colors.tabInactive;
+    const activeSecondaryStroke = focused ? colors.tabActive : colors.tabInactive;
+    
+    return (
+      <WrappedComponent
+        width={width}
+        height={height}
+        primaryFill={primaryFill}
+        secondaryFill={secondaryFill}
+        primaryStroke={primaryStroke || activePrimaryStroke}
+        secondaryStroke={secondaryStroke || activeSecondaryStroke}
+        primaryStrokeWidth={primaryStrokeWidth}
+        secondaryStrokeWidth={secondaryStrokeWidth}
+        focused={focused}
+        {...props}
+      />
+    );
+  };
+
+  return EnhancedComponent;
+};
+
+export default withIconProps;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\buttons\ComponentButton.tsx
+import React from 'react';
+
+interface ComponentButtonProps {
+    text: string;
+    onClick: () => void;
+}
+
+const ComponentButton: React.FC<ComponentButtonProps> = ({ text, onClick }) => {
+    return (
+        <button 
+            style={{
+                backgroundColor: 'black',
+                color: 'white',
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+            }} 
+            onClick={onClick}
+        >
+            {text}
+        </button>
+    );
+};
+
+export default ComponentButton;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\global-components\AuthForm.tsx
+import React from 'react';
+import { View, Text, TextInput, Button } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../theme/theme';
+
+type AuthFormProps = {
+  email: string;
+  password: string;
+  setEmail: (text: string) => void;
+  setPassword: (text: string) => void;
+  onSubmit: () => void;
+};
+
+export const AuthForm = ({
+  email,
+  password,
+  setEmail,
+  setPassword,
+  onSubmit,
+}: AuthFormProps) => {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  
+  return (
+    <View>
+      <Text style={{ color: colors.textPrimary, marginBottom: 10 }}>{t('auth.email')}:</Text>
+      <TextInput
+        style={{ 
+          borderWidth: 1, 
+          borderColor: colors.border,
+          backgroundColor: colors.surface,
+          color: colors.textPrimary,
+          marginBottom: 10, 
+          padding: 8 
+        }}
+        value={email}
+        onChangeText={setEmail}
+        placeholder={t('auth.enterEmail')}
+        placeholderTextColor={colors.textSecondary}
+        autoCapitalize="none"
+      />
+      <Text style={{ color: colors.textPrimary }}>{t('auth.password')}:</Text>
+      <TextInput
+        style={{ 
+          borderWidth: 1, 
+          borderColor: colors.border,
+          backgroundColor: colors.surface,
+          color: colors.textPrimary,
+          marginBottom: 10, 
+          padding: 8 
+        }}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        placeholder={t('auth.enterPassword')}
+        placeholderTextColor={colors.textSecondary}
+      />
+      <Button title={t('auth.login')} onPress={onSubmit} color={colors.primary} />
+    </View>
+  );
+};
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\global-components\CheckForToken.tsx
+import React, { useEffect } from 'react';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../theme/theme';
+
+const CheckForToken: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isLoading, checkAuth } = useAuth();
+  const navigation = useNavigation();
+  const { colors } = useTheme();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      // Only navigate if we're done loading and there's no user
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'LoginScreen' }],
+      });
+    }
+  }, [user, isLoading, navigation]);
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  // If there's a user or we're navigating to LoginScreen, render children
+  return <>{children}</>;
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
+
+export default CheckForToken;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\global-components\CustomStatusBar.tsx
+import React from 'react';
+import { StatusBar } from 'react-native';
+import { useTheme } from '../../theme/theme'; 
+
+const CustomStatusBar: React.FC = () => {
+  const theme = useTheme(); 
+
+  return (
+    <StatusBar
+      barStyle={theme.isDark ? 'light-content' : 'dark-content'}
+      backgroundColor={theme.colors.background}
+      translucent={false}
+    />
+  );
+};
+
+export default CustomStatusBar;
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\global-components\ProtectedScreen.tsx
+import React, { useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+
+const ProtectedScreen: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isLoading } = useAuth();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigation.navigate('LoginScreen');
+    }
+  }, [user, isLoading, navigation]);
+
+  if (isLoading || !user) {
+    return null; // Or loading spinner
+  }
+
+  return <>{children}</>;
+};
+
+export default ProtectedScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\context\AuthContext.tsx
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchUser, login as loginService, logout as logoutService } from '../api/authService';
+import { User } from '../types/global';
+
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isLoading: true,
+  login: async () => {},
+  logout: async () => {},
+  checkAuth: async () => {},
+});
+
+export const useAuth = () => useContext(AuthContext);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const checkAuth = async () => {
+    try {
+      setIsLoading(true);
+      const token = await AsyncStorage.getItem('token');
+      
+      if (token) {
+        const userData = await fetchUser(token);
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Authentication check failed:', error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const token = await loginService(email, password);
+      const userData = await fetchUser(token);
+      setUser(userData);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await logoutService();
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, isLoading, login, logout, checkAuth }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\i18n\index.ts
+// src/i18n/index.ts
+
+import i18next from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Import all locale files
+import en from './locales/en.json';
+import fr from './locales/fr.json';
+import nl from './locales/nl.json';
+
+// Define supported languages for easy maintenance
+export const SUPPORTED_LANGUAGES = ['en', 'fr', 'nl'] as const;
+export type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
+
+// Language detector for React Native
+const languageDetector = {
+  type: 'languageDetector',
+  async: true,
+  detect: async (callback: (lng: string) => void) => {
+    try {
+      const savedLanguage = await AsyncStorage.getItem('user-language');
+      callback(savedLanguage || 'en');
+    } catch (error) {
+      console.error('Error detecting language:', error);
+      callback('en');
+    }
+  },
+  init: () => {},
+  cacheUserLanguage: async (lng: string) => {
+    try {
+      await AsyncStorage.setItem('user-language', lng);
+    } catch (error) {
+      console.error('Error caching language:', error);
+    }
+  },
+};
+
+// Initialize i18next once
+i18next
+  .use(languageDetector)
+  .use(initReactI18next)
+  .init({
+    compatibilityJSON: 'v3',
+    fallbackLng: 'en',
+    resources: {
+      en: { translation: en },
+      fr: { translation: fr },
+      nl: { translation: nl },
+    },
+    interpolation: {
+      escapeValue: false,
+    },
+    returnObjects: true,
+  });
+
+/**
+ * Changes the application language
+ * @param language - The language code to switch to
+ * @returns Promise that resolves when language is changed
+ */
+export const changeLanguage = async (language: SupportedLanguage): Promise<void> => {
+  if (SUPPORTED_LANGUAGES.includes(language)) {
+    return i18next.changeLanguage(language);
+  }
+  console.warn(`Language ${language} not supported, falling back to English`);
+  return i18next.changeLanguage('en');
+};
+
+/**
+ * Gets the current language
+ * @returns The current language code
+ */
+export const getCurrentLanguage = (): string => {
+  return i18next.language || 'en';
+};
+
+export default i18next;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\i18n\locales\en.json
+{
+  "greeting": "Hello",
+  "farewell": "Goodbye",
+  "home": "Home",
+  "lastMinJob": "Last Minute Job",
+  "profile": "Profile",
+  "settings": "Settings",
+  "loginScreen": "Login Screen",
+  "vacancies": "Vacancies",
+  "application": "Application",
+  "planning": "Planning",
+  "chat": "Chat",
+  "backupJobs": "Backup Jobs",
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "enterEmail": "Enter email",
+    "enterPassword": "Enter password",
+    "loginFailed": "Login failed. Please check your credentials.",
+    "logout": "Logout"
+  },
+  "settingsScreen": {
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "settings": "Settings Screen",
+    "english": "English",
+    "french": "French",
+    "dutch": "Dutch",
+    "useGradient": "Use Gradient"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "sessionExpired": "Your session has expired"
+  }
+}
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\i18n\locales\fr.json
+{
+  "greeting": "Bonjour",
+  "farewell": "Au revoir",
+  "home": "Accueil",
+  "lastMinJob": "Emploi de dernière minute",
+  "profile": "Profil",
+  "settings": "Paramètres",
+  "loginScreen": "Login Screen",
+  "settingsScreen": {
+    "darkMode": "Mode Sombre",
+    "lightMode": "Mode Clair",
+    "settings": "Écran des Paramètres",
+    "english": "Anglais",
+    "french": "Français",
+    "dutch": "Néerlandais"
+  }
+}
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\i18n\locales\nl.json
+{
+  "greeting": "Hallo",
+  "farewell": "Vaarwel",
+  "home": "Thuis",
+  "lastMinJob": "Last Minute Baan",
+  "profile": "Profiel",
+  "settings": "Instellingen",
+  "loginScreen": "Login Screen",
+  "settingsScreen": {
+    "darkMode": "Donkere Modus",
+    "lightMode": "Lichte Modus",
+    "settings": "Instellingen Scherm",
+    "english": "Engels",
+    "french": "Frans",
+    "dutch": "Nederlands"
+  }
+}
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\navigation-constants.js
+import { Platform } from 'react-native';
+import i18next from 'i18next';
+
+// Import all screen components
+import HomeScreen from '../screens/bottom-five-screens/home-screen';
+import ProfileScreen from '../screens/profile-screen/index';
+import SettingsScreen from '../screens/settings-screen/index';
+import BackupJobs from '../screens/backup-jobs-screen';
+import VacanciesScreen from '../screens/bottom-five-screens/vacancies-screen';
+import ApplicationScreen from '../screens/bottom-five-screens/application-screen';
+import ChatScreen from '../screens/bottom-five-screens/chat-screen';
+import PlanningScreen from '../screens/bottom-five-screens/planning-screen';
+import LoginScreen from '../screens/login-screen/LoginScreen';
+
+
+import StackNavigator from '../navigation/stack-navigator/index';
+
+import ProtectedScreen from '../compoments/global-components/ProtectedScreen';
+
+
+// Define constants
+const ICON_SIZE = 24;
+const ICON_STROKE_WIDTH = 2;
+const ICON_SECONDARY_STROKE_WIDTH = 2;
+const ICON_SECONDARY_WIDTH = 20;
+const ICON_SECONDARY_HEIGHT = 20;
+
+const TAB_BAR_HEIGHT_IOS = 90;
+const TAB_BAR_HEIGHT_ANDROID = 70;
+const TAB_BAR_PADDING_BOTTOM_IOS = 30;
+const TAB_BAR_PADDING_BOTTOM_ANDROID = 10;
+const HEADER_HEIGHT_IOS = 44;
+const HEADER_HEIGHT_ANDROID = 56;
+
+export const NAVIGATION_CONFIG = {
+  headerTitleAlign: 'center',
+  defaultHeaderShown: true,
+};
+
+export const HEADER_CONFIG = {
+  height: Platform.select({
+    ios: HEADER_HEIGHT_IOS,
+    android: HEADER_HEIGHT_ANDROID,
+  }),
+  ...NAVIGATION_CONFIG,
+};
+
+export const TAB_BAR_CONFIG = {
+  iconSize: ICON_SIZE,
+  height: Platform.select({
+    ios: TAB_BAR_HEIGHT_IOS,
+    android: TAB_BAR_HEIGHT_ANDROID,
+  }),
+  paddingBottom: Platform.select({
+    ios: TAB_BAR_PADDING_BOTTOM_IOS,
+    android: TAB_BAR_PADDING_BOTTOM_ANDROID,
+  }),
+  strokeWidth: ICON_STROKE_WIDTH,
+  secondaryStrokeWidth: ICON_SECONDARY_STROKE_WIDTH,
+  secondaryWidth: ICON_SECONDARY_WIDTH,
+  secondaryHeight: ICON_SECONDARY_HEIGHT,
+};
+
+export const STACK_SCREENS = [
+  { 
+    name: 'Home',
+    component: HomeScreen,
+    translationKey: 'home',
+    options: { headerShown: false }
+  },
+  { 
+    name: 'Profile',
+    component: (props: any) => (
+      <ProtectedScreen>
+        <ProfileScreen {...props} />
+      </ProtectedScreen>
+    ),
+    translationKey: 'profile',
+  },
+  { 
+    name: 'backupJobs',
+    component: BackupJobs,
+    translationKey: 'backupJobs',
+  },
+  { 
+    name: 'LoginScreen',
+    component: LoginScreen,
+    translationKey: 'loginScreen',
+  },
+  { 
+    name: 'Settings',
+    component: SettingsScreen,
+    translationKey: 'settings',
+  },
+  
+];
+
+export const TAB_SCREENS = [
+  { 
+    name: 'Home',
+    component: StackNavigator,
+    translationKey: 'home',
+    showHeader: false,
+    requiresAuth: false // Public screen
+  },
+  { 
+    name: 'Vacancies',
+    component: VacanciesScreen,
+    translationKey: 'vacancies',
+    requiresAuth: true
+  },
+  { 
+    name: 'Application',
+    component: ApplicationScreen,
+    translationKey: 'application',
+    requiresAuth: true
+  },
+  { 
+    name: 'Planning',
+    component: PlanningScreen,
+    translationKey: 'planning',
+    requiresAuth: true
+  },
+  { 
+    name: 'Chat',
+    component: ChatScreen,
+    translationKey: 'chat',
+    requiresAuth: true
+  },
+];
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\BottomTabNavigator\BottomTabNavigator.tsx
+import React from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../theme/theme';
+import { TAB_BAR_CONFIG, HEADER_CONFIG, TAB_SCREENS } from '../navigation-constants';
+import { IconProps } from '../../types/global';
+import { ApplicationIcon, HomeIcon, VacanciesIcon, ChatIcon, PlanningIcon } from '../../assets/icons/bottom-tab-navigator-icons';
+
+const Tab = createBottomTabNavigator();
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+const ICON_COMPONENTS = {
+  Home: HomeIcon,
+  Vacancies: VacanciesIcon,
+  Application: ApplicationIcon,
+  Chat: ChatIcon,
+  Planning: PlanningIcon,
+};
+
+const BottomTabNavigation: React.FC = () => {
+  const { colors, isDark } = useTheme();
+  const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const filteredScreens = TAB_SCREENS.filter(screen => 
+    !screen.requiresAuth || (screen.requiresAuth && user)
+  );
+
+  return (
+    <View style={styles.container}>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused }) => {
+            const IconComponent = ICON_COMPONENTS[route.name] || HomeIcon;
+            return <IconComponent focused={focused} />;
+          },
+          tabBarActiveTintColor: colors.tabActive,
+          tabBarInactiveTintColor: colors.tabInactive,
+          tabBarStyle: {
+            backgroundColor: colors.surface,
+            height: TAB_BAR_CONFIG.height,
+            paddingBottom: TAB_BAR_CONFIG.paddingBottom,
+            borderTopColor: colors.border,
+            borderTopWidth: 1,
+            elevation: isDark ? 8 : 4,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
+          },
+          headerStyle: {
+            backgroundColor: colors.headerBg,
+            borderBottomColor: colors.border,
+            borderBottomWidth: 1,
+            height: HEADER_CONFIG.height,
+            elevation: isDark ? 8 : 4,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
+          },
+          headerTitleStyle: {
+            color: colors.textPrimary,
+            fontSize: SCREEN_WIDTH * 0.045,
+            fontWeight: '600',
+          },
+        })}
+      >
+        {filteredScreens.map(screen => (
+          <Tab.Screen
+            key={screen.name}
+            name={screen.name}
+            component={screen.component}
+            options={{
+              title: t(screen.translationKey, { defaultValue: screen.name }),
+              headerShown: screen.showHeader,
+            }}
+          />
+        ))}
+      </Tab.Navigator>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
+
+export default BottomTabNavigation;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\BottomTabNavigator\index.tsx
+//i exist just to make import easier and cleaer on other files
+
+import BottomTabNavigator from "./BottomTabNavigator";
+export default BottomTabNavigator;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\stack-navigator\index.js
+import StackNavigator from "./StackNavigator";
+
+export default StackNavigator;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\stack-navigator\StackNavigator.tsx
+import React from 'react';
+import { Dimensions } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { STACK_SCREENS, HEADER_CONFIG } from '../navigation-constants';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../theme/theme';
+import { LinearGradient } from 'react-native-linear-gradient';
+
+
+const Stack = createStackNavigator();
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+function StackNavigator() {
+  const { t } = useTranslation();
+  const { colors, isDark, useGradient } = useTheme();
+
+  return (
+    <Stack.Navigator
+      initialRouteName={STACK_SCREENS[0].name}
+      screenOptions={{
+        headerStyle: { 
+          height: HEADER_CONFIG.height,
+          backgroundColor: colors.headerBg,
+          borderBottomColor: colors.border,
+          borderBottomWidth: 1,
+          elevation: isDark ? 8 : 4,
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 3,
+        },
+        headerTitleAlign: HEADER_CONFIG.headerTitleAlign,
+        headerShown: HEADER_CONFIG.defaultHeaderShown,
+        headerTitleStyle: {
+          color: colors.textPrimary,
+          fontSize: SCREEN_WIDTH * 0.045, // Responsive font size
+          fontWeight: '600',
+        },
+        headerBackground: useGradient 
+          ? () => (
+              <LinearGradient
+                colors={[colors.gradientStart, colors.gradientEnd]}
+                style={{ flex: 1 }}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              />
+            )
+          : undefined
+      }}
+    >
+      {STACK_SCREENS.map(({ name, component, translationKey, options = {} }) => (
+        <Stack.Screen
+          key={name}
+          name={name}
+          component={component}
+          options={{
+            title: t(translationKey, { defaultValue: name }),
+            ...options,
+          }}
+        />
+      ))}
+    </Stack.Navigator>
+  );
+}
+
+export default StackNavigator;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\backup-jobs-screen\BackupJobs.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../theme/theme';
+
+const BackupJobs = () => {
+  const { colors } = useTheme();
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.text, { color: colors.secondary }]}>Backup Jobs</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 18,
+  },
+});
+
+export default BackupJobs;
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\backup-jobs-screen\index.js
+import backupJobs from "./BackupJobs";
+export default backupJobs;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\application-screen\ApplicationScreen.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const ApplicationScreen = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Application Screen</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+});
+
+export default ApplicationScreen;
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\application-screen\index.js
+import ApplicationScreen from "./ApplicationScreen";
+export default ApplicationScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\chat-screen\ChatScreen.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const ChatScreen = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Chat Screen</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+});
+
+export default ChatScreen;
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\chat-screen\index.js
+import ChatScreen from "./ChatScreen";
+export default ChatScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\home-screen\HomeScreen.tsx
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { useTheme } from '../../../theme/theme';
+import { useAuth } from '../../../context/AuthContext';
+import i18next from 'i18next';
+import TodosList from './components/TodosList';
+
+const HomeScreen = ({ navigation }) => {
+  const { colors } = useTheme();
+  const { user, isLoading } = useAuth();
+
+  const [todos, setTodos] = useState([
+    { id: 1, title: 'Specify your availability', subtitle: 'NOWJOBS is asking for your availability' },
+    { id: 2, title: 'Backup jobs (6)', subtitle: 'First job is on 25/02' },
+  ]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles(colors).container}>
+      <TodosList todos={todos} navigation={navigation} />
+      
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles(colors).todoItem}>
+            {/* Todo item content */}
+          </View>
+        )}
+      />
+
+      <View style={styles(colors).buttonContainer}>
+        <Button
+          title={i18next.t('profile', { defaultValue: 'Profile' }) || 'Profile'}
+          onPress={() => navigation.navigate('Profile')}
+          color={colors.primary}
+        />
+      </View>
+      
+      <View style={styles(colors).buttonContainer}>
+        <Button
+          title={i18next.t('settings', { defaultValue: 'Settings' }) || 'Settings'}
+          onPress={() => navigation.navigate('Settings')}
+          color={colors.primary}
+        />
+      </View>
+    </View>
+  );
+};
+
+const styles = (colors: any) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    padding: 20,
+  },
+  todoItem: {
+    backgroundColor: colors.card,
+    borderRadius: 10,
+    padding: 15,
+    marginVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  buttonContainer: {
+    margin: 10,
+  },
+});
+
+export default HomeScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\home-screen\index.js
+import HomeScreen from "./HomeScreen";
+
+export default HomeScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\home-screen\components\TodosList.js
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+
+const TodosList = ({ todos, navigation }) => {
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.todoItem}
+      onPress={() => {
+        if (item.id === 1) {
+          navigation.navigate('Settings');
+        } else if (item.id === 2) {
+          navigation.navigate('backupJobs');
+        }
+      }}
+    >
+      <View style={styles.textContainer}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.subtitle}>{item.subtitle}</Text>
+      </View>
+      <Text style={styles.arrow}> {'=>'} </Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Todo List</Text>
+      {todos.length === 0 ? (
+        <Text>No To-Do's for now</Text>
+      ) : (
+        <FlatList
+          data={todos}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()
+
+          }
+        />
+      )}
+    </View>
+  );
+};
+
+export default TodosList;
+
+const styles = StyleSheet.create({
+  container: {
+    padding:15,
+    flex: 1,
+    backgroundColor: 'lightgrey',
+    borderRadius:
+    10,
+
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    
+  },
+  noTodos: {
+    textAlign: 'center',
+    color: 'gray',
+  },
+  todoItem: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 5,
+    flexDirection: 'row', // Align text and arrow in a row
+    justifyContent: 'space-between', // Space between text and arrow
+    alignItems: 'center',
+    flex: 1,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  title: {
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    color: 'gray',
+  },
+  arrow: {
+    fontSize: 22,
+    color: '#000',
+  },
+});
+
+
+
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\planning-screen\index.js
+import PlanningScreen from "./PlanningScreen";
+export default PlanningScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\planning-screen\PlanningScreen.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const PlanningScreen: React.FC = () => {
+    return (
+        <View style={styles.container}>
+            <Text style={styles.text}>Planning Screen</Text>
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 20,
+        color: '#333',
+    },
+});
+
+export default PlanningScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\vacancies-screen\index.js
+import VacanciesScreen from "./VacanciesScreen";
+export default VacanciesScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\vacancies-screen\VacanciesScreen.tsx
+
+import React from 'react';
+import { View, Text } from 'react-native';
+import { useAuth } from '../../../context/AuthContext';
+
+const VacanciesScreen = () => {
+  const { user } = useAuth();
+
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Vacancies Screen</Text>
+      <Text style={{ fontSize: 18 }}>{user?.name || 'Loading...'}</Text>
+    </View>
+  );
+};
+
+export default VacanciesScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\login-screen\LoginScreen.tsx
+ // \src\screens\login-screen\LoginScreen.tsx
+
+import React, { useState } from 'react';
+import { View, Text, ActivityIndicator, Alert, Button, useNavigation } from 'react-native';
+import { useAuth } from '../../context/AuthContext';
+import { AuthForm } from '../../compoments/global-components/AuthForm';
+import { useTheme } from '../../theme/theme';
+
+export const LoginScreen = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { user, isLoading, login } = useAuth();
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+
+  const handleLogin = async () => {
+    try {
+      await login(email, password);
+      navigation.navigate('Home'); // Redirect to homepage after login
+    } catch (error) {
+      Alert.alert('Login Failed', 'Invalid credentials');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: colors.background }}>
+      <AuthForm
+        email={email}
+        password={password}
+        setEmail={setEmail}
+        setPassword={setPassword}
+        onSubmit={handleLogin}
+      />
+    </View>
+  );
+};
+
+export default LoginScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\profile-screen\index.js
+import ProfileScreen from "./ProfileScreen";    
+export default ProfileScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\profile-screen\ProfileScreen.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../theme/theme';
+
+const ProfileScreen: React.FC = () => {
+    const { colors } = useTheme();
+
+    return (
+        <View style={styles(colors).container}>
+            <Text style={styles(colors).text}>Profile Screen</Text>
+        </View>
+    );
+};
+
+const styles = (colors: any) => StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.background,
+    },
+    text: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: colors.text,
+    },
+});
+
+export default ProfileScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\settings-screen\index.js
+import SettingsScreen from "./SettingsScreen";  
+export default SettingsScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\settings-screen\SettingsScreen.tsx
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet, Switch, Dimensions, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useTheme, COLOR_SCHEMES } from '../../theme/theme';
+import { changeLanguage, getCurrentLanguage, SupportedLanguage } from '../../i18n';
+import { LinearGradient } from 'react-native-linear-gradient';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+const SettingsScreen: React.FC = () => {
+    const { colors, isDark, setScheme, useGradient, toggleGradient } = useTheme();
+    const { t } = useTranslation();
+    const [currentLang, setCurrentLang] = useState<SupportedLanguage>(getCurrentLanguage() as SupportedLanguage);
+    
+    const styles = dynamicStyles(colors, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // Handle language change
+    const handleLanguageChange = async (lng: SupportedLanguage) => {
+        await changeLanguage(lng);
+        setCurrentLang(lng);
+    };
+
+    const Container = useGradient ? LinearGradient : View;
+    const containerProps = useGradient ? {
+        colors: [colors.gradientStart, colors.gradientEnd],
+        start: { x: 0, y: 0 },
+        end: { x: 0, y: 1 },
+        style: styles.container
+    } : {
+        style: styles.container
+    };
+
+    return (
+        <Container {...containerProps}>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <View style={styles.card}>
+                    <Text style={styles.headerText}>{t('settingsScreen.settings')}</Text>
+                    
+                    <View style={styles.optionContainer}>
+                        <Text style={styles.optionLabel}>{isDark ? t('settingsScreen.darkMode') : t('settingsScreen.lightMode')}</Text>
+                        <Switch
+                            value={isDark}
+                            onValueChange={(value) => {
+                                setScheme(value ? COLOR_SCHEMES.DARK : COLOR_SCHEMES.LIGHT);
+                            }}
+                            trackColor={{ false: '#767577', true: `${colors.primary}80` }}
+                            thumbColor={isDark ? colors.primary : '#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                        />
+                    </View>
+
+                    <View style={styles.optionContainer}>
+                        <Text style={styles.optionLabel}>Use Gradient Background</Text>
+                        <Switch
+                            value={useGradient}
+                            onValueChange={toggleGradient}
+                            trackColor={{ false: '#767577', true: `${colors.primary}80` }}
+                            thumbColor={useGradient ? colors.primary : '#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                        />
+                    </View>
+                </View>
+                
+                <View style={styles.card}>
+                    <Text style={styles.sectionTitle}>{t('settings')}</Text>
+                    
+                    <View style={styles.languageButtonsContainer}>
+                        <View style={[
+                            styles.languageButton, 
+                            currentLang === 'en' && { backgroundColor: `${colors.primary}15` }
+                        ]}>
+                            <Button
+                                title={t('settingsScreen.english')}
+                                onPress={() => handleLanguageChange('en')}
+                                color={currentLang === 'en' ? colors.primary : colors.textSecondary}
+                            />
+                        </View>
+                        
+                        <View style={[
+                            styles.languageButton, 
+                            currentLang === 'fr' && { backgroundColor: `${colors.primary}15` }
+                        ]}>
+                            <Button
+                                title={t('settingsScreen.french')}
+                                onPress={() => handleLanguageChange('fr')}
+                                color={currentLang === 'fr' ? colors.primary : colors.textSecondary}
+                            />
+                        </View>
+                        
+                        <View style={[
+                            styles.languageButton, 
+                            currentLang === 'nl' && { backgroundColor: `${colors.primary}15` }
+                        ]}>
+                            <Button
+                                title={t('settingsScreen.dutch')}
+                                onPress={() => handleLanguageChange('nl')}
+                                color={currentLang === 'nl' ? colors.primary : colors.textSecondary}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </ScrollView>
+        </Container>
+    );
+};
+
+const dynamicStyles = (colors: any, screenWidth: number, screenHeight: number) => StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: colors.background,
+    },
+    scrollContent: {
+        padding: screenWidth * 0.05,
+        paddingBottom: screenHeight * 0.1,
+    },
+    card: {
+        backgroundColor: colors.surface,
+        borderRadius: 12,
+        padding: screenWidth * 0.05,
+        marginBottom: screenHeight * 0.02,
+        shadowColor: colors.shadow,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    headerText: {
+        fontSize: screenWidth * 0.06,
+        fontWeight: 'bold',
+        color: colors.textPrimary,
+        marginBottom: screenHeight * 0.02,
+    },
+    sectionTitle: {
+        fontSize: screenWidth * 0.05,
+        fontWeight: 'bold',
+        color: colors.textPrimary,
+        marginBottom: screenHeight * 0.02,
+    },
+    optionContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: screenHeight * 0.015,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    optionLabel: {
+        fontSize: screenWidth * 0.04,
+        color: colors.textPrimary,
+    },
+    languageButtonsContainer: {
+        marginTop: screenHeight * 0.01,
+    },
+    languageButton: {
+        marginVertical: screenHeight * 0.01,
+        borderRadius: 8,
+        overflow: 'hidden',
+    },
+});
+
+export default SettingsScreen;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\theme\theme.tsx
+import { Appearance, StyleSheet } from 'react-native';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+export const COLOR_SCHEMES = {
+  LIGHT: 'light',
+  DARK: 'dark',
+} as const;
+
+export type ColorScheme = typeof COLOR_SCHEMES[keyof typeof COLOR_SCHEMES];
+
+// Primary brand colors
+const BRAND_PRIMARY = '#DE004D'; // Vibrant red accent
+const BRAND_SECONDARY = '#211547'; // Deep purple/navy
+
+// Enhanced color palette
+export const COLORS = {
+  light: {
+    // Core colors
+    primary: BRAND_PRIMARY,
+    secondary: BRAND_SECONDARY,
+    background: '#F9FAFC',
+    surface: '#FFFFFF',
+    error: '#E74C3C',
+    
+    // Text & borders
+    textPrimary: '#1E293B',
+    textSecondary: '#64748B',
+    border: '#E2E8F0',
+    shadow: '#1E293B',
+    
+    // Specials
+    accent: BRAND_PRIMARY,
+    success: '#10B981',
+    warning: '#F59E0B',
+    info: '#3B82F6',
+    
+    // Navigation
+    tabActive: BRAND_PRIMARY,
+    tabInactive: '#94A3B8',
+    headerBg: '#FFFFFF',
+    
+    // Gradient options
+    gradientStart: '#FFFFFF',
+    gradientEnd: '#F1F5F9',
+  },
+  dark: {
+    // Core colors
+    primary: BRAND_PRIMARY,
+    secondary: '#6366F1',
+    background: '#0F172A',
+    surface: '#1E293B',
+    error: '#EF4444',
+    
+    // Text & borders
+    textPrimary: '#F8FAFC',
+    textSecondary: '#CBD5E0',
+    border: '#334155',
+    shadow: '#000000',
+    
+    // Specials
+    accent: BRAND_PRIMARY,
+    success: '#10B981',
+    warning: '#F59E0B',
+    info: '#3B82F6',
+    
+    // Navigation
+    tabActive: BRAND_PRIMARY,
+    tabInactive: '#64748B',
+    headerBg: '#1E293B',
+    
+    // Gradient options
+    gradientStart: '#0F172A',
+    gradientEnd: BRAND_SECONDARY,
+  },
+};
+
+type ThemeContextType = {
+  isDark: boolean;
+  colors: typeof COLORS.light;
+  setScheme: (scheme: ColorScheme) => void;
+  useGradient: boolean;
+  toggleGradient: () => void;
+};
+
+export const ThemeContext = createContext<ThemeContextType>({
+  isDark: false,
+  colors: COLORS.light,
+  setScheme: () => {},
+  useGradient: false,
+  toggleGradient: () => {},
+});
+
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Initialize with device preference
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(
+    Appearance.getColorScheme() || COLOR_SCHEMES.LIGHT
+  );
+  
+  // Gradient toggle state
+  const [useGradient, setUseGradient] = useState(false);
+  
+  // Listen for system theme changes
+  useEffect(() => {
+    const subscription = Appearance.addChangeListener(({ colorScheme: newColorScheme }) => {
+      if (newColorScheme) {
+        setColorScheme(newColorScheme as ColorScheme);
+      }
+    });
+    
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const setScheme = (scheme: ColorScheme) => {
+    setColorScheme(scheme);
+  };
+  
+  const toggleGradient = () => {
+    setUseGradient(prev => !prev);
+  };
+
+  const isDark = colorScheme === COLOR_SCHEMES.DARK;
+  const colors = isDark ? COLORS.dark : COLORS.light;
+
+  return (
+    <ThemeContext.Provider value={{ isDark, colors, setScheme, useGradient, toggleGradient }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+// Hook for easy theme access
+export const useTheme = () => useContext(ThemeContext);
+
+// Utility function to get responsive sizes
+export const getResponsiveSize = (size: number, screenDimension: number) => {
+  return screenDimension * (size / 100);
+};
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\types\global.d.ts
+import React from 'react';
+import { SvgProps } from 'react-native-svg';
+
+declare module '*.png' {
+    const value: any;
+    export default value;
+}
+
+declare module '*.jpg' {
+    const value: any;
+    export default value;
+}
+
+declare module '*.jpeg' {
+    const value: any;
+    export default value;
+}
+
+declare module '*.gif' {
+    const value: any;
+    export default value;
+}
+
+declare module '*.svg' {
+    const content: React.FC<SvgProps>;
+    export default content;
+}
+
+declare module 'react-native-dotenv' {
+    export const API_URL: string;
+    export const ANOTHER_ENV_VAR: string;
+}
+
+declare namespace React {
+  type ReactNode = React.ReactChild | React.ReactFragment | React.ReactPortal | boolean | null | undefined;
+}
+
+export interface IconProps {
+  width?: number;
+  height?: number;
+  primaryFill?: string;
+  secondaryFill?: string;
+  primaryStroke?: string;
+  secondaryStroke?: string;
+  primaryStrokeWidth?: number;
+  secondaryStrokeWidth?: number;
+}
+
+export type BottomTabParamList = {
+  Home: undefined;
+  Vacancies: undefined;
+  Application: undefined;
+  Chat: undefined;
+  Planning: undefined;
+};
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\utils\AuthHelpers.tsx
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { login, fetchUser, logout } from '../api/authService';
+
+/**
+ * Checks if user has a valid authentication token
+ * @returns Promise resolving to boolean indicating if token exists
+ */
+export const hasValidToken = async (): Promise<boolean> => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    return !!token;
+  } catch (error) {
+    console.error('Error checking token:', error);
+    return false;
+  }
+};
+
+/**
+ * Performs login and stores user data in context
+ * @param email User email
+ * @param password User password
+ * @param setUser Function to update user in context
+ * @returns Promise resolving to the logged in user or error
+ */
+export const performLogin = async (
+  email: string, 
+  password: string, 
+  setUser: (user: any) => void
+): Promise<any> => {
+  try {
+    const token = await login(email, password);
+    const userData = await fetchUser(token);
+    setUser(userData);
+    return userData;
+  } catch (error) {
+    console.error('Login failed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Performs logout and clears user data
+ * @param setUser Function to clear user in context
+ */
+export const performLogout = async (setUser: (user: null) => void): Promise<void> => {
+  try {
+    await logout();
+    setUser(null);
+  } catch (error) {
+    console.error('Logout failed:', error);
+    throw error;
+  }
+};
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\utils\Formhelpers.tsx
+// src/utils/formHelpers.ts
+
+/**
+ * Basic email validation
+ * @param email Email to validate
+ * @returns Boolean indicating if email format is valid
+ */
+export const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  
+  /**
+   * Password validation - requires at least 8 characters
+   * @param password Password to validate
+   * @returns Boolean indicating if password meets requirements
+   */
+  export const isValidPassword = (password: string): boolean => {
+    return password.length >= 5;
+  };
+  
+  /**
+   * Form field validation helper
+   * @param fieldName Name of the field
+   * @param value Field value
+   * @param rules Validation rules to apply
+   * @returns Error message or empty string if valid
+   */
+  export const validateField = (
+    fieldName: string,
+    value: string,
+    rules: {
+      required?: boolean;
+      minLength?: number;
+      maxLength?: number;
+      isEmail?: boolean;
+      isPassword?: boolean;
+    }
+  ): string => {
+    if (rules.required && !value) {
+      return `${fieldName} is required`;
+    }
+    
+    if (rules.minLength && value.length < rules.minLength) {
+      return `${fieldName} must be at least ${rules.minLength} characters`;
+    }
+    
+    if (rules.maxLength && value.length > rules.maxLength) {
+      return `${fieldName} must be less than ${rules.maxLength} characters`;
+    }
+    
+    if (rules.isEmail && !isValidEmail(value)) {
+      return `Please enter a valid email address`;
+    }
+    
+    if (rules.isPassword && !isValidPassword(value)) {
+      return `Password must be at least 8 characters`;
+    }
+    
+    return '';
+  };
+

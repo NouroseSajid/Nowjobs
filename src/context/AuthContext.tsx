@@ -1,36 +1,28 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchUser } from '../api/authService';
-import { performLogout, performLogin } from '../utils/AuthHelpers';
+import { fetchUser, login as loginService, logout as logoutService } from '../api/authService';
+import { User } from '../types/global';
 
-type User = {
-  id: string;
-  email: string;
-  name: string;
-  // Add other user properties as needed
-  // For example:
-} | null;
-
-type AuthContextType = {
-  user: User;
+interface AuthContextType {
+  user: User | null;
   isLoading: boolean;
-  setUser: (user: User) => void;
-  checkAuth: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  login: (email: string, password: string) => Promise<any>; // new login function
-};
+  checkAuth: () => Promise<void>;
+}
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
-  setUser: () => {},
-  checkAuth: async () => {},
+  login: async () => {},
   logout: async () => {},
-  login: async () => {} // new login default
+  checkAuth: async () => {},
 });
 
+export const useAuth = () => useContext(AuthContext);
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const checkAuth = async () => {
@@ -52,17 +44,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = async () => {
+  const login = async (email: string, password: string) => {
     try {
-      await performLogout(setUser);
+      const token = await loginService(email, password);
+      const userData = await fetchUser(token);
+      setUser(userData);
     } catch (error) {
-      console.error('Logout in context failed:', error);
+      console.error('Login failed:', error);
+      throw error;
     }
   };
 
-  // new login function using performLogin
-  const login = async (email: string, password: string) => {
-    return await performLogin(email, password, setUser);
+  const logout = async () => {
+    try {
+      await logoutService();
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      throw error;
+    }
   };
 
   useEffect(() => {
@@ -70,10 +70,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, setUser, checkAuth, logout, login }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);
