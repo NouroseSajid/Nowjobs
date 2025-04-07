@@ -1,24 +1,88 @@
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\api\.env
+API_URL=http://localhost:3000
+REGISTER_URL=http://localhost:3000/api/users/register
+LOGIN_URL=http://localhost:3000/api/users/login
+
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\api\authService.tsx
+// src/api/authService.tsx
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { withTimeout } from '../utils/timeout';
 
-const API_URL = "http://192.168.0.110:3000";
+const API_URL = process.env.API_URL;
+const LOGIN_URL = process.env.LOGIN_URL; // New environment variable for login URL
+const API_TIMEOUT = 60000; // 60 seconds
+const SERVER_CHECK_TIMEOUT = 3000; // 3 seconds for server status check
 
-export const login = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/login`, { email, password });
-  await AsyncStorage.setItem("token", response.data.token);
-  return response.data.token;
+// Server health check utility
+const checkServerStatus = async (): Promise<boolean> => {
+  try {
+    await withTimeout(
+      axios.head(`${API_URL}/health`), // Using HEAD request for efficiency
+      SERVER_CHECK_TIMEOUT
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
 
-export const fetchUser = async (token: string) => {
-  const response = await axios.get(`${API_URL}/user`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
+export const login = async (email: string, password: string): Promise<string> => {
+  try {
+    // First check server availability
+    const isServerLive = await checkServerStatus();
+    if (!isServerLive) {
+      throw new Error('server_unreachable');
+    }
+
+    // Use the new LOGIN_URL from .env for the login endpoint.
+    const response = await withTimeout(
+      axios.post(`${LOGIN_URL}`, { email, password }),
+      API_TIMEOUT
+    );
+
+    await AsyncStorage.setItem('token', response.data.token);
+    return response.data.token;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
+    // Handle different error scenarios
+    if (errorMessage.includes('timed out')) {
+      throw new Error('server_timeout');
+    }
+    if (errorMessage.includes('server_unreachable')) {
+      throw new Error('server_unreachable');
+    }
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'login_failed');
+    }
+    throw new Error('login_failed');
+  }
 };
 
-export const logout = async () => {
-  await AsyncStorage.removeItem("token");
+export const fetchUser = async (token: string): Promise<User> => {
+  try {
+    const response = await withTimeout(
+      axios.get(`${API_URL}/user`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      API_TIMEOUT
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('timed out')) {
+      throw new Error('server_timeout');
+    }
+    throw new Error('failed_to_fetch_user');
+  }
+};
+
+export const logout = async (): Promise<void> => {
+  try {
+    await AsyncStorage.removeItem('token');
+  } catch (error) {
+    throw new Error('logout_failed');
+  }
 };
 
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\assets\icons\bottom-tab-navigator-icons\ApplicationIcon.tsx
@@ -390,39 +454,13 @@ const withIconProps = (WrappedComponent: React.FC<IconProps>) => {
 
 export default withIconProps;
 
-// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\buttons\ComponentButton.tsx
-import React from 'react';
-
-interface ComponentButtonProps {
-    text: string;
-    onClick: () => void;
-}
-
-const ComponentButton: React.FC<ComponentButtonProps> = ({ text, onClick }) => {
-    return (
-        <button 
-            style={{
-                backgroundColor: 'black',
-                color: 'white',
-                padding: '10px 20px',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-            }} 
-            onClick={onClick}
-        >
-            {text}
-        </button>
-    );
-};
-
-export default ComponentButton;
-
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\global-components\AuthForm.tsx
 import React from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
+import { View, TextInput, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../theme/theme';
+import Button from '../ui/Button'; 
+import useGlobalStyles from '../../global_styles/GlobalStyles'; // Adjust the path as needed
 
 type AuthFormProps = {
   email: string;
@@ -430,6 +468,7 @@ type AuthFormProps = {
   setEmail: (text: string) => void;
   setPassword: (text: string) => void;
   onSubmit: () => void;
+  loading?: boolean; // Added loading prop
 };
 
 export const AuthForm = ({
@@ -438,45 +477,64 @@ export const AuthForm = ({
   setEmail,
   setPassword,
   onSubmit,
+  loading = false, 
 }: AuthFormProps) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  
+  const G = useGlobalStyles();
+
   return (
-    <View>
-      <Text style={{ color: colors.textPrimary, marginBottom: 10 }}>{t('auth.email')}:</Text>
-      <TextInput
-        style={{ 
-          borderWidth: 1, 
-          borderColor: colors.border,
-          backgroundColor: colors.surface,
-          color: colors.textPrimary,
-          marginBottom: 10, 
-          padding: 8 
-        }}
-        value={email}
-        onChangeText={setEmail}
-        placeholder={t('auth.enterEmail')}
-        placeholderTextColor={colors.textSecondary}
-        autoCapitalize="none"
-      />
-      <Text style={{ color: colors.textPrimary }}>{t('auth.password')}:</Text>
-      <TextInput
-        style={{ 
-          borderWidth: 1, 
-          borderColor: colors.border,
-          backgroundColor: colors.surface,
-          color: colors.textPrimary,
-          marginBottom: 10, 
-          padding: 8 
-        }}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholder={t('auth.enterPassword')}
-        placeholderTextColor={colors.textSecondary}
-      />
-      <Button title={t('auth.login')} onPress={onSubmit} color={colors.primary} />
+    <View style={G.fullWidth}>
+      <View style={G.inputContainer}>
+        <Text style={{ color: colors.textPrimary, marginBottom: 8 }}>
+          {t('auth.email')}:
+        </Text>
+        <TextInput
+          style={{
+            borderWidth: 1,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            color: colors.textPrimary,
+            padding: 12,
+            borderRadius: 8,
+          }}
+          value={email}
+          onChangeText={setEmail}
+          placeholder={t('auth.enterEmail')}
+          placeholderTextColor={colors.textSecondary}
+          autoCapitalize="none"
+        />
+      </View>
+
+      <View style={G.inputContainer}>
+        <Text style={{ color: colors.textPrimary, marginBottom: 8 }}>
+          {t('auth.password')}:
+        </Text>
+        <TextInput
+          style={{
+            borderWidth: 1,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            color: colors.textPrimary,
+            padding: 12,
+            borderRadius: 8,
+          }}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholder={t('auth.enterPassword')}
+          placeholderTextColor={colors.textSecondary}
+        />
+      </View>
+
+      <Button
+        onPress={onSubmit}
+        mode="contained"
+        loading={loading}
+        style={G.fullWidth}
+      >
+        {t('auth.login')}
+      </Button>
     </View>
   );
 };
@@ -573,33 +631,243 @@ const ProtectedScreen: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
 export default ProtectedScreen;
 
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\ui\Button.tsx
+import React from 'react';
+import { TouchableOpacity, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { useTheme } from '../../theme/theme';
+
+type ButtonProps = {
+  onPress: () => void;
+  children: string;
+  mode?: 'contained' | 'outlined';
+  loading?: boolean;
+  style?: object;
+};
+
+const Button = ({ 
+  onPress, 
+  children, 
+  mode = 'contained', 
+  loading = false, 
+  style 
+}: ButtonProps) => {
+  const { colors } = useTheme();
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.button,
+        {
+          backgroundColor: mode === 'contained' ? colors.primary : 'transparent',
+          borderWidth: mode === 'outlined' ? 1 : 0,
+          borderColor: colors.primary,
+        },
+        style,
+      ]}
+      disabled={loading}
+      accessibilityLabel={children}
+    >
+      {loading ? (
+        <ActivityIndicator color={colors.textPrimary} />
+      ) : (
+        <Text style={[
+          styles.text,
+          {
+            color: mode === 'contained' ? colors.buttonText : colors.primary,
+          }
+        ]}>
+          {children}
+        </Text>
+      )}
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8,
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
+
+export default Button;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\ui\Card.tsx
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { useTheme } from '../../theme/theme';
+
+type CardProps = {
+  children: React.ReactNode;
+  style?: object;
+};
+
+const Card = ({ children, style }: CardProps) => {
+  const { colors } = useTheme();
+
+  return (
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.surface,
+          shadowColor: colors.shadow,
+        },
+        style,
+      ]}
+    >
+      {children}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+});
+
+export default Card;
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\ui\index.tsx
+export { default as Button } from './Button';
+export { default as Card } from './Card';
+export { default as Switch} from './Switch';
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\compoments\ui\Switch.tsx
+import React from 'react';
+import { Switch, Pressable, Animated, StyleSheet } from 'react-native';
+import { useTheme } from '../../theme/theme';
+
+type CustomSwitchProps = {
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+  style?: object;
+};
+
+const CustomSwitch = ({ value, onValueChange, style }: CustomSwitchProps) => {
+  const { colors } = useTheme();
+  const translateX = React.useRef(new Animated.Value(value ? 18 : 0)).current;
+
+  const toggleSwitch = () => {
+    Animated.timing(translateX, {
+      toValue: value ? 0 : 18,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+    onValueChange(!value);
+  };
+
+  return (
+    <Pressable
+      onPress={toggleSwitch}
+      style={[
+        styles.container,
+        {
+          backgroundColor: value ? `${colors.primary}30` : colors.border,
+        },
+        style,
+      ]}
+    >
+      <Animated.View
+        style={[
+          styles.thumb,
+          {
+            backgroundColor: value ? colors.primary : colors.surface,
+            transform: [{ translateX }],
+          },
+        ]}
+      />
+    </Pressable>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    width: 50,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    padding: 2,
+  },
+  thumb: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+});
+
+export default CustomSwitch;
+
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\context\AuthContext.tsx
+// src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchUser, login as loginService, logout as logoutService } from '../api/authService';
+import { Alert } from 'react-native';
 import { User } from '../types/global';
+import { useTranslation } from 'react-i18next';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  error: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  handleServerError: (error: Error) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
+  error: null,
   login: async () => {},
   logout: async () => {},
   checkAuth: async () => {},
+  handleServerError: () => {}
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleServerError = (error: Error) => {
+    Alert.alert(
+      t('errors.serverDown'),
+      t('errors.serverDownMessage'),
+      [{
+        text: 'OK',
+        onPress: async () => {
+          await logout();
+        }
+      }]
+    );
+  };
 
   const checkAuth = async () => {
     try {
@@ -613,8 +881,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
       }
     } catch (error) {
-      console.error('Authentication check failed:', error);
-      setUser(null);
+      handleServerError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -622,12 +889,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
+      setIsLoading(true);
       const token = await loginService(email, password);
       const userData = await fetchUser(token);
       setUser(userData);
+      setError(null);
     } catch (error) {
-      console.error('Login failed:', error);
+      setError((error as Error).message);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -636,7 +907,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await logoutService();
       setUser(null);
     } catch (error) {
-      console.error('Logout failed:', error);
+      setError((error as Error).message);
       throw error;
     }
   };
@@ -646,11 +917,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, checkAuth }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isLoading, 
+        error,
+        login, 
+        logout, 
+        checkAuth,
+        handleServerError 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\global_styles\GlobalStyles.tsx
+import { StyleSheet } from "react-native";
+import { useTheme } from "../theme/theme";
+
+export default function useGlobalStyles() {
+  const { colors } = useTheme();
+  
+  return StyleSheet.create({
+    main_Screen_container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+      padding: 16,
+    },
+    main_Screen_text: {
+      fontSize: 25,
+      fontWeight: "bold",
+      color: colors.textPrimary,
+    },
+    skeletonText: {
+      width: 120,
+      height: 20,
+    },
+    skeletonBox: {
+      width: 150,
+      height: 150,
+    },
+    // Add common layout styles
+    fullWidth: {
+      width: '100%',
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    spaceBetween: {
+      justifyContent: 'space-between',
+    },
+    inputContainer: {
+      width: '100%',
+      marginBottom: 16,
+    },
+  });
+}
 
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\i18n\index.ts
 // src/i18n/index.ts
@@ -753,7 +1080,8 @@ export default i18next;
     "enterEmail": "Enter email",
     "enterPassword": "Enter password",
     "loginFailed": "Login failed. Please check your credentials.",
-    "logout": "Logout"
+    "logout": "Logout",
+    "invalidCredentials": "Please check your email and password"
   },
   "settingsScreen": {
     "darkMode": "Dark Mode",
@@ -766,7 +1094,12 @@ export default i18next;
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",
-    "sessionExpired": "Your session has expired"
+    "sessionExpired": "Your session has expired",
+    "serverDown": "Server Unavailable",
+    "serverDownMessage": "Our services are currently unavailable. Please try again later.",
+    "server_timeout": "Server Timeout",
+    "try_again_later": "Please try again in a few moments",
+    "genericError": "Something went wrong"
   }
 }
 
@@ -779,6 +1112,11 @@ export default i18next;
   "profile": "Profil",
   "settings": "Paramètres",
   "loginScreen": "Login Screen",
+  "vacancies": "Offres d'emploi",
+  "application": "Candidature",
+  "planning": "Planification",
+  "chat": "Discussion",
+  "backupJobs": "Sauvegarde des emplois",
   "settingsScreen": {
     "darkMode": "Mode Sombre",
     "lightMode": "Mode Clair",
@@ -786,6 +1124,25 @@ export default i18next;
     "english": "Anglais",
     "french": "Français",
     "dutch": "Néerlandais"
+  },
+  "errors": {
+    "serverDown": "Server Unavailable",
+    "serverDownMessage": "Our services are currently unavailable. Please try again later.",
+    "server_timeout": "Server Timeout",
+    "try_again_later": "Please try again in a few moments",
+    "genericError": "Something went wrong",
+    "somethingWentWrong": "Quelque chose s'est mal passé",
+    "sessionExpired": "Votre session a expiré"
+  },
+  "auth": {
+    "invalidCredentials": "Please check your email and password",
+    "login": "Connexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "enterEmail": "Entrez l'email",
+    "enterPassword": "Entrez le mot de passe",
+    "loginFailed": "Échec de la connexion. Veuillez vérifier vos identifiants.",
+    "logout": "Déconnexion"
   }
 }
 
@@ -799,6 +1156,11 @@ export default i18next;
   "profile": "Profiel",
   "settings": "Instellingen",
   "loginScreen": "Login Screen",
+  "vacancies": "Vacatures",
+  "application": "Sollicitatie",
+  "planning": "Planning",
+  "chat": "Chat",
+  "backupJobs": "Backup Banen",
   "settingsScreen": {
     "darkMode": "Donkere Modus",
     "lightMode": "Lichte Modus",
@@ -806,6 +1168,25 @@ export default i18next;
     "english": "Engels",
     "french": "Frans",
     "dutch": "Nederlands"
+  },
+  "errors": {
+    "serverDown": "Server Unavailable",
+    "serverDownMessage": "Our services are currently unavailable. Please try again later.",
+    "server_timeout": "Server Timeout",
+    "try_again_later": "Please try again in a few moments",
+    "genericError": "Something went wrong",
+    "somethingWentWrong": "Er is iets misgegaan",
+    "sessionExpired": "Uw sessie is verlopen"
+  },
+  "auth": {
+    "invalidCredentials": "Please check your email and password",
+    "login": "Inloggen",
+    "email": "E-mail",
+    "password": "Wachtwoord",
+    "enterEmail": "Voer e-mail in",
+    "enterPassword": "Voer wachtwoord in",
+    "loginFailed": "Inloggen mislukt. Controleer uw inloggegevens.",
+    "logout": "Uitloggen"
   }
 }
 
@@ -944,6 +1325,8 @@ export const TAB_SCREENS = [
 
 
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\BottomTabNavigator\BottomTabNavigator.tsx
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\BottomTabNavigator\BottomTabNavigator.tsx
+
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { View, StyleSheet, Dimensions } from 'react-native';
@@ -1050,6 +1433,8 @@ import StackNavigator from "./StackNavigator";
 export default StackNavigator;
 
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\stack-navigator\StackNavigator.tsx
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\stack-navigator\StackNavigator.tsx
+
 import React from 'react';
 import { Dimensions } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -1057,7 +1442,6 @@ import { STACK_SCREENS, HEADER_CONFIG } from '../navigation-constants';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../theme/theme';
 import { LinearGradient } from 'react-native-linear-gradient';
-
 
 const Stack = createStackNavigator();
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -1097,7 +1481,7 @@ function StackNavigator() {
                 end={{ x: 1, y: 0 }}
               />
             )
-          : undefined
+          : undefined,
       }}
     >
       {STACK_SCREENS.map(({ name, component, translationKey, options = {} }) => (
@@ -1152,31 +1536,73 @@ export default backupJobs;
 
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\application-screen\ApplicationScreen.tsx
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Animated, StyleSheet, Dimensions } from 'react-native';
+import useGlobalStyles from '../../../global_styles/GlobalStyles';
+
+const { width } = Dimensions.get('window');
+
+const Skeleton = ({ style }) => {
+  const animatedValue = new Animated.Value(-width);
+  
+  Animated.loop(
+    Animated.timing(animatedValue, {
+      toValue: width,
+      duration: 1000,
+      useNativeDriver: true
+    })
+  ).start();
+
+  return (
+    <View style={[styles.skeleton, style, { overflow: 'hidden' }]}>
+      <Animated.View
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(255,255,255,0.3)',
+          transform: [{ translateX: animatedValue }]
+        }}
+      />
+    </View>
+  );
+};
 
 const ApplicationScreen = () => {
+  const G = useGlobalStyles();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Application Screen</Text>
+    <View style={G.main_Screen_container}>
+      
+      <Skeleton style={[G.skeletonText, { marginBottom: 20 }]} />
+      <View style={styles.boxContainer}>
+        <Skeleton style={G.skeletonBox} />
+        <Skeleton style={G.skeletonBox} />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  skeleton: {
+    backgroundColor: '#e1e1e1',
+    borderRadius: 4,
   },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
+  boxContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  }
 });
 
-export default ApplicationScreen;
+// Add these to your GlobalStyles:
+// skeletonText: {
+//   width: 120,
+//   height: 20,
+// },
+// skeletonBox: {
+//   width: 150,
+//   height: 150,
+// },
 
+export default ApplicationScreen;
 
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\application-screen\index.js
 import ApplicationScreen from "./ApplicationScreen";
@@ -1301,6 +1727,8 @@ export default HomeScreen;
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\bottom-five-screens\home-screen\components\TodosList.js
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import { Card } from '../../../../compoments/ui';
+
 
 const TodosList = ({ todos, navigation }) => {
   const renderItem = ({ item }) => (
@@ -1323,20 +1751,20 @@ const TodosList = ({ todos, navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Todo List</Text>
-      {todos.length === 0 ? (
-        <Text>No To-Do's for now</Text>
-      ) : (
-        <FlatList
-          data={todos}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()
-
-          }
-        />
-      )}
-    </View>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.header}>Todo List</Text>
+        {todos.length === 0 ? (
+          <Text>No To-Do's for now</Text>
+        ) : (
+          <FlatList
+            data={todos}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        )}
+      </View>
+    </>
   );
 };
 
@@ -1442,40 +1870,47 @@ const VacanciesScreen = () => {
 export default VacanciesScreen;
 
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\login-screen\LoginScreen.tsx
- // \src\screens\login-screen\LoginScreen.tsx
-
 import React, { useState } from 'react';
-import { View, Text, ActivityIndicator, Alert, Button, useNavigation } from 'react-native';
+import { View, Alert } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { AuthForm } from '../../compoments/global-components/AuthForm';
 import { useTheme } from '../../theme/theme';
+import { useTranslation } from 'react-i18next';
 
-export const LoginScreen = () => {
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { user, isLoading, login } = useAuth();
+  const { login, handleServerError } = useAuth();
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const handleLogin = async () => {
     try {
       await login(email, password);
-      navigation.navigate('Home'); // Redirect to homepage after login
     } catch (error) {
-      Alert.alert('Login Failed', 'Invalid credentials');
+      switch(error.message) {
+        case 'server_unreachable':
+          handleServerError(error);
+          break;
+        case 'server_timeout':
+          Alert.alert(t('errors.server_timeout'), t('errors.try_again_later'));
+          break;
+        case 'login_failed':
+          Alert.alert(t('auth.loginFailed'), t('auth.invalidCredentials'));
+          break;
+        default:
+          Alert.alert(t('errors.genericError'));
+      }
     }
   };
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: colors.background }}>
+    <View style={{ 
+      flex: 1, 
+      justifyContent: 'center', 
+      padding: 20, 
+      backgroundColor: colors.background 
+    }}>
       <AuthForm
         email={email}
         password={password}
@@ -1529,164 +1964,181 @@ import SettingsScreen from "./SettingsScreen";
 export default SettingsScreen;
 
 // File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\screens\settings-screen\SettingsScreen.tsx
-import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, Switch, Dimensions, ScrollView } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useTheme, COLOR_SCHEMES } from '../../theme/theme';
+import { useTheme } from '../../theme/theme';
+import { Button, Card, Switch } from '../../compoments/ui';
 import { changeLanguage, getCurrentLanguage, SupportedLanguage } from '../../i18n';
-import { LinearGradient } from 'react-native-linear-gradient';
+import { COLOR_SCHEMES } from '../../theme/theme';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../context/AuthContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+interface LanguageButtonProps {
+  language: SupportedLanguage;
+  currentLang: SupportedLanguage;
+  onPress: (lang: SupportedLanguage) => void;
+}
+
 const SettingsScreen: React.FC = () => {
-    const { colors, isDark, setScheme, useGradient, toggleGradient } = useTheme();
-    const { t } = useTranslation();
-    const [currentLang, setCurrentLang] = useState<SupportedLanguage>(getCurrentLanguage() as SupportedLanguage);
-    
-    const styles = dynamicStyles(colors, SCREEN_WIDTH, SCREEN_HEIGHT);
+  const { t } = useTranslation();
+  const { colors, isDark, setScheme, useGradient, toggleGradient } = useTheme();
+  const { logout } = useAuth();
+  const navigation = useNavigation();
+  const [currentLang, setCurrentLang] = useState<SupportedLanguage>(
+    getCurrentLanguage() as SupportedLanguage
+  );
+  const [changingLang, setChangingLang] = useState(false);
 
-    // Handle language change
-    const handleLanguageChange = async (lng: SupportedLanguage) => {
-        await changeLanguage(lng);
-        setCurrentLang(lng);
-    };
+  const handleLanguageChange = useCallback(async (lng: SupportedLanguage) => {
+    try {
+      setChangingLang(true);
+      await changeLanguage(lng);
+      setCurrentLang(lng);
+    } finally {
+      setChangingLang(false);
+    }
+  }, []);
 
-    const Container = useGradient ? LinearGradient : View;
-    const containerProps = useGradient ? {
-        colors: [colors.gradientStart, colors.gradientEnd],
-        start: { x: 0, y: 0 },
-        end: { x: 0, y: 1 },
-        style: styles.container
-    } : {
-        style: styles.container
-    };
+  const handleLogout = useCallback(async () => {
+    await logout();
+    navigation.navigate('LoginScreen');
+  }, [logout, navigation]);
 
-    return (
-        <Container {...containerProps}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.card}>
-                    <Text style={styles.headerText}>{t('settingsScreen.settings')}</Text>
-                    
-                    <View style={styles.optionContainer}>
-                        <Text style={styles.optionLabel}>{isDark ? t('settingsScreen.darkMode') : t('settingsScreen.lightMode')}</Text>
-                        <Switch
-                            value={isDark}
-                            onValueChange={(value) => {
-                                setScheme(value ? COLOR_SCHEMES.DARK : COLOR_SCHEMES.LIGHT);
-                            }}
-                            trackColor={{ false: '#767577', true: `${colors.primary}80` }}
-                            thumbColor={isDark ? colors.primary : '#f4f3f4'}
-                            ios_backgroundColor="#3e3e3e"
-                        />
-                    </View>
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Card style={styles.sectionCard}>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          {t('settingsScreen.appearance')}
+        </Text>
 
-                    <View style={styles.optionContainer}>
-                        <Text style={styles.optionLabel}>Use Gradient Background</Text>
-                        <Switch
-                            value={useGradient}
-                            onValueChange={toggleGradient}
-                            trackColor={{ false: '#767577', true: `${colors.primary}80` }}
-                            thumbColor={useGradient ? colors.primary : '#f4f3f4'}
-                            ios_backgroundColor="#3e3e3e"
-                        />
-                    </View>
-                </View>
-                
-                <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>{t('settings')}</Text>
-                    
-                    <View style={styles.languageButtonsContainer}>
-                        <View style={[
-                            styles.languageButton, 
-                            currentLang === 'en' && { backgroundColor: `${colors.primary}15` }
-                        ]}>
-                            <Button
-                                title={t('settingsScreen.english')}
-                                onPress={() => handleLanguageChange('en')}
-                                color={currentLang === 'en' ? colors.primary : colors.textSecondary}
-                            />
-                        </View>
-                        
-                        <View style={[
-                            styles.languageButton, 
-                            currentLang === 'fr' && { backgroundColor: `${colors.primary}15` }
-                        ]}>
-                            <Button
-                                title={t('settingsScreen.french')}
-                                onPress={() => handleLanguageChange('fr')}
-                                color={currentLang === 'fr' ? colors.primary : colors.textSecondary}
-                            />
-                        </View>
-                        
-                        <View style={[
-                            styles.languageButton, 
-                            currentLang === 'nl' && { backgroundColor: `${colors.primary}15` }
-                        ]}>
-                            <Button
-                                title={t('settingsScreen.dutch')}
-                                onPress={() => handleLanguageChange('nl')}
-                                color={currentLang === 'nl' ? colors.primary : colors.textSecondary}
-                            />
-                        </View>
-                    </View>
-                </View>
-            </ScrollView>
-        </Container>
-    );
+        <View style={styles.optionRow}>
+          <Text style={[styles.optionLabel, { color: colors.textPrimary }]}>
+            {t('settingsScreen.darkMode')}
+          </Text>
+          <CustomSwitch
+            value={isDark}
+            onValueChange={(value) => setScheme(value ? COLOR_SCHEMES.DARK : COLOR_SCHEMES.LIGHT)}
+          />
+        </View>
+
+        <View style={styles.optionRow}>
+          <Text style={[styles.optionLabel, { color: colors.textPrimary }]}>
+            {t('settingsScreen.useGradient')}
+          </Text>
+          <CustomSwitch value={useGradient} onValueChange={toggleGradient} />
+        </View>
+      </Card>
+
+      <Card style={styles.sectionCard}>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          {t('settingsScreen.language')}
+        </Text>
+
+        <View style={styles.languageContainer}>
+          <LanguageButton
+            language="en"
+            currentLang={currentLang}
+            onPress={handleLanguageChange}
+            disabled={changingLang}
+          />
+          <LanguageButton
+            language="fr"
+            currentLang={currentLang}
+            onPress={handleLanguageChange}
+            disabled={changingLang}
+          />
+          <LanguageButton
+            language="nl"
+            currentLang={currentLang}
+            onPress={handleLanguageChange}
+            disabled={changingLang}
+          />
+        </View>
+      </Card>
+
+      <Card style={styles.sectionCard}>
+        <Button
+          mode="contained"
+          onPress={handleLogout}
+          style={styles.logoutButton}
+          textStyle={styles.logoutText}
+          destructive
+        >
+          {t('auth.logout')}
+        </Button>
+      </Card>
+    </View>
+  );
 };
 
-const dynamicStyles = (colors: any, screenWidth: number, screenHeight: number) => StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    scrollContent: {
-        padding: screenWidth * 0.05,
-        paddingBottom: screenHeight * 0.1,
-    },
-    card: {
-        backgroundColor: colors.surface,
-        borderRadius: 12,
-        padding: screenWidth * 0.05,
-        marginBottom: screenHeight * 0.02,
-        shadowColor: colors.shadow,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    headerText: {
-        fontSize: screenWidth * 0.06,
-        fontWeight: 'bold',
-        color: colors.textPrimary,
-        marginBottom: screenHeight * 0.02,
-    },
-    sectionTitle: {
-        fontSize: screenWidth * 0.05,
-        fontWeight: 'bold',
-        color: colors.textPrimary,
-        marginBottom: screenHeight * 0.02,
-    },
-    optionContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: screenHeight * 0.015,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border,
-    },
-    optionLabel: {
-        fontSize: screenWidth * 0.04,
-        color: colors.textPrimary,
-    },
-    languageButtonsContainer: {
-        marginTop: screenHeight * 0.01,
-    },
-    languageButton: {
-        marginVertical: screenHeight * 0.01,
-        borderRadius: 8,
-        overflow: 'hidden',
-    },
+const LanguageButton: React.FC<LanguageButtonProps & { disabled?: boolean }> = ({
+  language,
+  currentLang,
+  onPress,
+  disabled,
+}) => {
+  const { colors } = useTheme();
+  const { t } = useTranslation();
+  const isActive = language === currentLang;
+
+  return (
+    <Button
+      mode={isActive ? 'contained' : 'outlined'}
+      onPress={() => onPress(language)}
+      style={styles.languageButton}
+      disabled={disabled}
+      accessibilityLabel={`Select ${t(`settingsScreen.${language}`)} language`}
+    >
+      {t(`settingsScreen.${language}`)}
+    </Button>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: SCREEN_WIDTH * 0.05,
+  },
+  sectionCard: {
+    marginBottom: SCREEN_HEIGHT * 0.025,
+    padding: SCREEN_WIDTH * 0.04,
+  },
+  sectionTitle: {
+    fontSize: SCREEN_WIDTH * 0.045,
+    fontWeight: '700',
+    marginBottom: SCREEN_HEIGHT * 0.02,
+  },
+  optionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: SCREEN_HEIGHT * 0.015,
+  },
+  optionLabel: {
+    fontSize: SCREEN_WIDTH * 0.04,
+    flex: 1,
+    marginRight: 16,
+  },
+  languageContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SCREEN_WIDTH * 0.03,
+    marginTop: SCREEN_HEIGHT * 0.01,
+  },
+  languageButton: {
+    minWidth: SCREEN_WIDTH * 0.25,
+  },
+  logoutButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+  },
+  logoutText: {
+    color: '#E53E3E', // Using direct color for destructive actions
+    fontWeight: '600',
+  },
 });
 
 export default SettingsScreen;
@@ -2005,5 +2457,19 @@ export const isValidEmail = (email: string): boolean => {
     }
     
     return '';
+  };
+
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\utils\Timeout.tsx
+export const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error('Request timed out'));
+      }, ms);
+  
+      promise
+        .then(resolve)
+        .catch(reject)
+        .finally(() => clearTimeout(timer));
+    });
   };
 

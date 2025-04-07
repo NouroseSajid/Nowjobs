@@ -6,6 +6,11 @@
   "profile": "Profiel",
   "settings": "Instellingen",
   "loginScreen": "Login Screen",
+  "vacancies": "Vacatures",
+  "application": "Sollicitatie",
+  "planning": "Planning",
+  "chat": "Chat",
+  "backupJobs": "Backup Banen",
   "settingsScreen": {
     "darkMode": "Donkere Modus",
     "lightMode": "Lichte Modus",
@@ -13,5 +18,24 @@
     "english": "Engels",
     "french": "Frans",
     "dutch": "Nederlands"
+  },
+  "errors": {
+    "serverDown": "Server Unavailable",
+    "serverDownMessage": "Our services are currently unavailable. Please try again later.",
+    "server_timeout": "Server Timeout",
+    "try_again_later": "Please try again in a few moments",
+    "genericError": "Something went wrong",
+    "somethingWentWrong": "Er is iets misgegaan",
+    "sessionExpired": "Uw sessie is verlopen"
+  },
+  "auth": {
+    "invalidCredentials": "Please check your email and password",
+    "login": "Inloggen",
+    "email": "E-mail",
+    "password": "Wachtwoord",
+    "enterEmail": "Voer e-mail in",
+    "enterPassword": "Voer wachtwoord in",
+    "loginFailed": "Inloggen mislukt. Controleer uw inloggegevens.",
+    "logout": "Uitloggen"
   }
 }

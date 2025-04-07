@@ -1,3 +1,5 @@
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\BottomTabNavigator\BottomTabNavigator.tsx
+
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { View, StyleSheet, Dimensions } from 'react-native';

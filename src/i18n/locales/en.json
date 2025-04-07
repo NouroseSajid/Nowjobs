@@ -18,7 +18,8 @@
     "enterEmail": "Enter email",
     "enterPassword": "Enter password",
     "loginFailed": "Login failed. Please check your credentials.",
-    "logout": "Logout"
+    "logout": "Logout",
+    "invalidCredentials": "Please check your email and password"
   },
   "settingsScreen": {
     "darkMode": "Dark Mode",
@@ -31,6 +32,11 @@
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",
-    "sessionExpired": "Your session has expired"
+    "sessionExpired": "Your session has expired",
+    "serverDown": "Server Unavailable",
+    "serverDownMessage": "Our services are currently unavailable. Please try again later.",
+    "server_timeout": "Server Timeout",
+    "try_again_later": "Please try again in a few moments",
+    "genericError": "Something went wrong"
   }
 }

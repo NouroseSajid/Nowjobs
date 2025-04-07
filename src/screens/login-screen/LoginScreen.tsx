@@ -1,38 +1,44 @@
- // \src\screens\login-screen\LoginScreen.tsx
-
 import React, { useState } from 'react';
-import { View, Text, ActivityIndicator, Alert, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Alert } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { AuthForm } from '../../compoments/global-components/AuthForm';
 import { useTheme } from '../../theme/theme';
+import { useTranslation } from 'react-i18next';
 
-export const LoginScreen = () => {
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { user, isLoading, login } = useAuth();
+  const { login, handleServerError } = useAuth();
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const handleLogin = async () => {
     try {
       await login(email, password);
-      navigation.navigate('Home'); // Redirect to homepage after login
     } catch (error) {
-      Alert.alert('Login Failed', 'Invalid credentials');
+      switch(error.message) {
+        case 'server_unreachable':
+          handleServerError(error);
+          break;
+        case 'server_timeout':
+          Alert.alert(t('errors.server_timeout'), t('errors.try_again_later'));
+          break;
+        case 'login_failed':
+          Alert.alert(t('auth.loginFailed'), t('auth.invalidCredentials'));
+          break;
+        default:
+          Alert.alert(t('errors.genericError'));
+      }
     }
   };
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: colors.background }}>
+    <View style={{ 
+      flex: 1, 
+      justifyContent: 'center', 
+      padding: 20, 
+      backgroundColor: colors.background 
+    }}>
       <AuthForm
         email={email}
         password={password}

@@ -1,5 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import { Card } from '../../../../compoments/ui';
+
 
 const TodosList = ({ todos, navigation }) => {
   const renderItem = ({ item }) => (
@@ -22,20 +24,20 @@ const TodosList = ({ todos, navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Todo List</Text>
-      {todos.length === 0 ? (
-        <Text>No To-Do's for now</Text>
-      ) : (
-        <FlatList
-          data={todos}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()
-
-          }
-        />
-      )}
-    </View>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.header}>Todo List</Text>
+        {todos.length === 0 ? (
+          <Text>No To-Do's for now</Text>
+        ) : (
+          <FlatList
+            data={todos}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        )}
+      </View>
+    </>
   );
 };
 

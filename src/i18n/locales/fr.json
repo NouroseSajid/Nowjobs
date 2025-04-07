@@ -6,6 +6,11 @@
   "profile": "Profil",
   "settings": "Paramètres",
   "loginScreen": "Login Screen",
+  "vacancies": "Offres d'emploi",
+  "application": "Candidature",
+  "planning": "Planification",
+  "chat": "Discussion",
+  "backupJobs": "Sauvegarde des emplois",
   "settingsScreen": {
     "darkMode": "Mode Sombre",
     "lightMode": "Mode Clair",
@@ -13,5 +18,24 @@
     "english": "Anglais",
     "french": "Français",
     "dutch": "Néerlandais"
+  },
+  "errors": {
+    "serverDown": "Server Unavailable",
+    "serverDownMessage": "Our services are currently unavailable. Please try again later.",
+    "server_timeout": "Server Timeout",
+    "try_again_later": "Please try again in a few moments",
+    "genericError": "Something went wrong",
+    "somethingWentWrong": "Quelque chose s'est mal passé",
+    "sessionExpired": "Votre session a expiré"
+  },
+  "auth": {
+    "invalidCredentials": "Please check your email and password",
+    "login": "Connexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "enterEmail": "Entrez l'email",
+    "enterPassword": "Entrez le mot de passe",
+    "loginFailed": "Échec de la connexion. Veuillez vérifier vos identifiants.",
+    "logout": "Déconnexion"
   }
 }

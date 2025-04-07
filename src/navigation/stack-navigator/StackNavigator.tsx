@@ -1,3 +1,5 @@
+// File: C:\Users\Nouro\Desktop\cp\Nowjobs\src\navigation\stack-navigator\StackNavigator.tsx
+
 import React from 'react';
 import { Dimensions } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -5,7 +7,6 @@ import { STACK_SCREENS, HEADER_CONFIG } from '../navigation-constants';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../theme/theme';
 import { LinearGradient } from 'react-native-linear-gradient';
-
 
 const Stack = createStackNavigator();
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -45,7 +46,7 @@ function StackNavigator() {
                 end={{ x: 1, y: 0 }}
               />
             )
-          : undefined
+          : undefined,
       }}
     >
       {STACK_SCREENS.map(({ name, component, translationKey, options = {} }) => (

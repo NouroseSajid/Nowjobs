@@ -1,29 +1,51 @@
+// src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchUser, login as loginService, logout as logoutService } from '../api/authService';
+import { Alert } from 'react-native';
 import { User } from '../types/global';
+import { useTranslation } from 'react-i18next';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  error: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  handleServerError: (error: Error) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
+  error: null,
   login: async () => {},
   logout: async () => {},
   checkAuth: async () => {},
+  handleServerError: () => {}
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleServerError = (error: Error) => {
+    Alert.alert(
+      t('errors.serverDown'),
+      t('errors.serverDownMessage'),
+      [{
+        text: 'OK',
+        onPress: async () => {
+          await logout();
+        }
+      }]
+    );
+  };
 
   const checkAuth = async () => {
     try {
@@ -37,8 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
       }
     } catch (error) {
-      console.error('Authentication check failed:', error);
-      setUser(null);
+      handleServerError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -46,12 +67,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
+      setIsLoading(true);
       const token = await loginService(email, password);
       const userData = await fetchUser(token);
       setUser(userData);
+      setError(null);
     } catch (error) {
-      console.error('Login failed:', error);
+      setError((error as Error).message);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await logoutService();
       setUser(null);
     } catch (error) {
-      console.error('Logout failed:', error);
+      setError((error as Error).message);
       throw error;
     }
   };
@@ -70,7 +95,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, checkAuth }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isLoading, 
+        error,
+        login, 
+        logout, 
+        checkAuth,
+        handleServerError 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
