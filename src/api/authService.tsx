@@ -1,85 +1,140 @@
 // src/api/authService.tsx
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { withTimeout } from '../utils/timeout';
 
-const API_URL = process.env.API_URL || 'http://192.168.0.100:3000'; // fallback default using local IP
-const LOGIN_URL = process.env.LOGIN_URL || 'http://192.168.0.100:3000/login'; // fallback default using local IP
-const API_TIMEOUT = 60000; // 60 seconds
-const SERVER_CHECK_TIMEOUT = 3000; // 3 seconds for server status check
+// Define constants for API URLs and timeouts
+const API_BASE_URL = 'http://192.168.1.22:3000'; // Base URL for all endpoints
+const API_TIMEOUT = 15000; // 15 seconds (more reasonable than 60)
 
-// Add a helper sleep function for delay
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-// Server health check utility
-const checkServerStatus = async (): Promise<boolean> => {
-  // Wait for 2 seconds before checking server status
-  await sleep(2000);
-  try {
-    await withTimeout(
-      axios.head(`${API_URL}/health`), // Using HEAD request for efficiency
-      SERVER_CHECK_TIMEOUT
-    );
-    return true;
-  } catch (error) {
-    return false;
+// Create a configured axios instance
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
   }
+});
+
+/**
+ * Utility to add timeout to any promise
+ */
+const withTimeout = async <T,>(promise: Promise<T>, ms: number): Promise<T> => {
+  const timeout = new Promise<T>((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('Request timed out'));
+    }, ms);
+  });
+
+  return Promise.race([promise, timeout]);
 };
 
+/**
+ * Authenticate user with email and password
+ */
 export const login = async (email: string, password: string): Promise<string> => {
   try {
-    // First check server availability
-    const isServerLive = await checkServerStatus();
-    if (!isServerLive) {
-      throw new Error('server_unreachable');
-    }
-
-    // Use the new LOGIN_URL from .env for the login endpoint.
+    console.log('Attempting login...');
+    
     const response = await withTimeout(
-      axios.post(`${LOGIN_URL}`, { email, password }),
+      api.post('/api/users/login', { email, password }),
       API_TIMEOUT
     );
 
+    if (!response.data?.token) {
+      throw new Error('No token received in response');
+    }
+
     await AsyncStorage.setItem('token', response.data.token);
+    console.log('Login successful, token stored');
     return response.data.token;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Login error:', error);
     
-    // Handle different error scenarios
-    if (errorMessage.includes('timed out')) {
+    // Handle specific error cases
+    if (error.message === 'Request timed out') {
       throw new Error('server_timeout');
     }
-    if (errorMessage.includes('server_unreachable')) {
-      throw new Error('server_unreachable');
-    }
+    
     if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || 'login_failed');
+      const serverMessage = error.response?.data?.message;
+      if (serverMessage) {
+        throw new Error(serverMessage);
+      }
+      
+      if (error.response?.status === 401) {
+        throw new Error('Invalid email or password');
+      }
+      
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('server_timeout');
+      }
     }
+    
     throw new Error('login_failed');
   }
 };
 
-export const fetchUser = async (token: string): Promise<User> => {
+/**
+ * Fetch authenticated user data
+ */
+export const fetchUser = async (token: string): Promise<any> => {
   try {
+    console.log('Fetching user data...');
+    
     const response = await withTimeout(
-      axios.get(`${API_URL}/user`, {
-        headers: { Authorization: `Bearer ${token}` },
+      api.get('/api/users/me', {
+        headers: { Authorization: `Bearer ${token}` }
       }),
       API_TIMEOUT
     );
+
+    if (!response.data) {
+      throw new Error('No user data received');
+    }
+
+    console.log('User data fetched successfully');
     return response.data;
   } catch (error) {
-    if (error instanceof Error && error.message.includes('timed out')) {
+    console.error('Failed to fetch user:', error);
+    
+    if (error.message === 'Request timed out') {
       throw new Error('server_timeout');
     }
+    
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      // Token is invalid, clear it
+      await AsyncStorage.removeItem('token');
+      throw new Error('session_expired');
+    }
+    
     throw new Error('failed_to_fetch_user');
   }
 };
 
+/**
+ * Log out the current user
+ */
 export const logout = async (): Promise<void> => {
   try {
+    console.log('Logging out user...');
     await AsyncStorage.removeItem('token');
+    console.log('User logged out successfully');
   } catch (error) {
-    throw new Error('logout_failed');
+    console.error('Failed to logout:', error);
+    // Even if storage fails, we'll consider it a successful logout
+  }
+};
+
+/**
+ * Check if there's an active session
+ */
+export const checkSession = async (): Promise<boolean> => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    return !!token;
+  } catch (error) {
+    console.error('Error checking session:', error);
+    return false;
   }
 };

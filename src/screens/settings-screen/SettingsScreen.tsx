@@ -8,6 +8,9 @@ import { COLOR_SCHEMES } from '../../theme/theme';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 
+import CustomSwitch from '../../compoments/ui/Switch';
+
+
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface LanguageButtonProps {

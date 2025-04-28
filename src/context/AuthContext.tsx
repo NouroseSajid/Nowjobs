@@ -13,7 +13,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
-  handleServerError: (error: Error) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -23,7 +22,6 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   logout: async () => {},
   checkAuth: async () => {},
-  handleServerError: () => {}
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -102,8 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         error,
         login, 
         logout, 
-        checkAuth,
-        handleServerError 
+        checkAuth 
       }}
     >
       {children}
